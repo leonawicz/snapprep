@@ -1,3 +1,20 @@
+#' snapprep: R functions for data prep and curation from raw SNAP data.
+#'
+#' \code{snapprep} is a developer package for the SNAPverse, used for preparing data sets for SNAPverse data packages.
+#'
+#' The \code{snapprep} package contains R functions used to support a wide range of SNAP projects by preparing and curating useful data sets
+#' from upstream raw SNAP data. The data sets compiled with the aid of \code{snapprep} are then made avaible to other projects.
+#' This includes compiling data sets that are contained in SNAPverse data packages.
+#'
+#' \code{snapprep} is a developer package used by the SNAPverse author and maintainer.
+#' For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages,
+#' see the `snapfuns` package instead.
+
+#'
+#' @docType package
+#' @name snapprep
+NULL
+
 #' @importFrom magrittr %>%
 NULL
 
