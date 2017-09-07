@@ -15,20 +15,19 @@
 #' \dontrun{clim_inputs_table()}
 clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5var,
                               models = snapdef()$ar5all){
-  rcps <- map(models, ~rep(list.files(.x), each = length(vars))) %>% map(~.x[.x != "rcp26"])
-  models <- map2(models, rcps, ~rep(.x, each = length(.y)))
-  vars <- map(models, ~rep(vars, length = length(.x)))
-  zero.min <- map(vars, ~.x == "pr")
+  rcps <- purrr::map(models, ~rep(list.files(.x), each = length(vars))) %>% purrr::map(~.x[.x != "rcp26"])
+  models <- purrr::map2(models, rcps, ~rep(.x, each = length(.y)))
+  vars <- purrr::map(models, ~rep(vars, length = length(.x)))
+  zero.min <- purrr::map(vars, ~.x == "pr")
   tibble::data_frame(rcp = unlist(rcps), model = unlist(models),
                      var = unlist(vars), zero = unlist(zero.min))
 }
 
 .get_clim_files <- function(rcp, model, variable, dir = getwd()){
-  mos.lab <- c(paste0(0, 1:9), 10:12)
   files <- list.files(file.path(dir, model, rcp, variable), pattern=".tif$", full.names = TRUE)
   n <- nchar(files)
-  yrs <- as.numeric(substr(files, n-7, n-4))
-  mos <- substr(files, n-10, n-9)
+  yrs <- as.numeric(substr(files, n - 7, n - 4))
+  mos <- substr(files, n - 10, n - 9)
   ord <- order(paste(yrs, mos))
   list(files = files[ord], years = yrs[ord], months = mos[ord])
 }
@@ -60,23 +59,23 @@ clim_dist_monthly <- function(model_idx, cells, inputs, in_dir = snapdef()$ar5di
                               na.rm = TRUE, density.args = list(n = 200, adjust = 0.1),
                               sample.size = 10000, verbose = TRUE, overwrite = FALSE){
   verbose <- if(verbose & model_idx == 1) TRUE else FALSE
-  inputs <- inputs[model_idx,]
+  inputs <- inputs[model_idx, ]
   rcp <- inputs$rcp
   model <- inputs$model
   variable <- inputs$var
   zero.min <- inputs$zero
-  files <- get_files(rcp, model, variable, in_dir)
+  files <- .get_clim_files(rcp, model, variable, in_dir)
   x0 <- as.matrix(raster::stack(files$files, quick=TRUE))
   if(verbose) print("Matrix in memory...")
-  if(na.rm) x0 <- x0[!is.na(x0[,1]),]
+  if(na.rm) x0 <- x0[!is.na(x0[, 1]), ]
   for(i in unique(cells$LocGroup)){
-    cells.i <- dplyr::filter(cells, .data[["LocGroup"]] == i)
+    cells.i <- dplyr::filter(cells, .data[["LocGroup"]] == i) # nolint
     for(j in unique(cells.i$Location)){
       dir.create(grpDir <- file.path(out_dir, i,  j), showWarnings = FALSE, recursive = TRUE)
       file <- paste0(grpDir, "/", variable, "_", rcp, "_", model, ".rds")
       if(!overwrite && exists(file)) next
       if(verbose) print(paste("Compiling data for", j, "..."))
-      cells.ij <- dplyr::filter(cells.i, .data[["Location"]] == j)
+      cells.ij <- dplyr::filter(cells.i, .data[["Location"]] == j) # nolint
       idx <- if(na.rm) cells.ij$Cell_rmNA else cells.ij$Cell
       x <- x0[idx, ]
       use_sample <- nrow(x) > sample.size
@@ -89,10 +88,10 @@ clim_dist_monthly <- function(model_idx, cells, inputs, in_dir = snapdef()$ar5di
       if(verbose) print(paste("Number of time slices:", length(nam)))
       x <- parallel::mclapply(x, rvtable::rvtable, density.args = density.args, mc.cores = 32)
       x <- purrr::map2(x, nam, ~dplyr::mutate(
-        .data[[".x"]], Year = as.integer(substr(.data[[".y"]], 1, 4)),
-        Month = as.integer(substr(.data[[".y"]], 6, 7)))) %>%
+        .x, Year = as.integer(substr(.y, 1, 4)), # nolint
+        Month = as.integer(substr(.y, 6, 7)))) %>% # nolint
         dplyr::bind_rows() %>% tibble::data_frame() %>%
-        dplyr::select(.data[["Year"]], .data[["Month"]], .data[["Val"]], .data[["Prob"]])
+        dplyr::select(.data[["Year"]], .data[["Month"]], .data[["Val"]], .data[["Prob"]]) # nolint
       if(zero.min && any(x$Val < 0)) warning("Density includes values less than zero.")
       saveRDS(x, file)
     }
@@ -126,17 +125,17 @@ clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
   .seasonal <- function(x, season, density.args){
     .season <- function(x, months){
       yrs <- range(x$Year)
-      x <- dplyr::filter(x, .data[["Month"]] %in% months)
+      x <- dplyr::filter(x, .data[["Month"]] %in% months) # nolint
       if(any(months == 12)){
         y <- dplyr::mutate(
-          x, Year = ifelse(.data[["Month"]] == 12, .data[["Year"]] + 1L, .data[["Year"]])) %>%
-          dplyr::filter(.data[["Year"]] > yrs[1] & .data[["Year"]] <= yrs[2])
-        x <- dplyr::filter(x, .data[["Year"]] == yrs[1]) %>% dplyr::bind_rows(y)
+          x, Year = ifelse(.data[["Month"]] == 12, .data[["Year"]] + 1L, .data[["Year"]])) %>% # nolint
+          dplyr::filter(.data[["Year"]] > yrs[1] & .data[["Year"]] <= yrs[2]) # nolint
+        x <- dplyr::filter(x, .data[["Year"]] == yrs[1]) %>% dplyr::bind_rows(y) # nolint
       }
       rvtable::rvtable(x)
     }
     x <- switch(season,
-                "annual" = rvtable::rvtable(x), "winter" = .season(x, c(1,2,12)),
+                "annual" = rvtable::rvtable(x), "winter" = .season(x, c(1, 2, 12)),
                 "spring" = .season(x, 3:5), "summer" = .season(x, 6:8), "autumn" = .season(x, 9:11))
     rvtable::marginalize(x, "Month", density.args = density.args)
   }
@@ -177,7 +176,6 @@ clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
 clim_stats_ar5 <- function(files, type = "monthly", out_dir = snapdef()$ar5dir_dist_stats[1], mc.cores = 32){
   if(!type %in% c("monthly", "seasonal")) stop("`type` must be 'monthly' or 'seasonal'.")
   grpDir <- dirname(files[1])
-  locgrp <- dirname(grpDir)
   loc <- basename(grpDir)
   dir.create(out_dir <- file.path(out_dir, grpDir), showWarnings = FALSE, recursive = TRUE)
   rcp_levels <- c("Historical", "4.5", "6.0", "8.5")
@@ -204,12 +202,17 @@ clim_stats_ar5 <- function(files, type = "monthly", out_dir = snapdef()$ar5dir_d
     readRDS(files$files[i]) %>% rvtable::rvtable %>% rvtable::sample_rvtable %>%
       dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]]) %>%
       dplyr::summarise(
-        Mean = round(mean(.data[["Val"]]), 1), SD = round(sd(.data[["Val"]]), 1),
+        Mean = round(mean(.data[["Val"]]), 1),
+        SD = round(stats::sd(.data[["Val"]]), 1),
         Min = round(min(.data[["Val"]]), 1),
-        Pct_05 = round(quantile(.data[["Val"]], 0.05), 1), Pct_10 = round(quantile(.data[["Val"]], 0.10), 1),
-        Pct_25 = round(quantile(.data[["Val"]], 0.25), 1), Pct_50 = round(quantile(.data[["Val"]], 0.50), 1),
-        Pct_75 = round(quantile(.data[["Val"]], 0.75), 1), Pct_90 = round(quantile(.data[["Val"]], 0.90), 1),
-        Pct_95 = round(quantile(.data[["Val"]], 0.95), 1), Max = round(max(.data[["Val"]]), 1)) %>%
+        Pct_05 = round(stats::quantile(.data[["Val"]], 0.05), 1),
+        Pct_10 = round(stats::quantile(.data[["Val"]], 0.10), 1),
+        Pct_25 = round(stats::quantile(.data[["Val"]], 0.25), 1),
+        Pct_50 = round(stats::quantile(.data[["Val"]], 0.50), 1),
+        Pct_75 = round(stats::quantile(.data[["Val"]], 0.75), 1),
+        Pct_90 = round(stats::quantile(.data[["Val"]], 0.90), 1),
+        Pct_95 = round(stats::quantile(.data[["Val"]], 0.95), 1),
+        Max = round(max(.data[["Val"]]), 1)) %>%
       dplyr::ungroup() %>% dplyr::mutate(
         Region = files$Region[i], Var = files$Var[i], RCP = files$RCP[i], GCM = files$GCM[i],
         Season = files$Season[i])
@@ -224,7 +227,7 @@ clim_stats_ar5 <- function(files, type = "monthly", out_dir = snapdef()$ar5dir_d
       .data[["Pct_50"]], .data[["Pct_75"]], .data[["Pct_90"]], .data[["Pct_95"]], .data[["Max"]]) %>%
       dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Region"]],
                      .data[["Var"]], .data[["Year"]], .data[["Season"]])
-    if(type == "monthly") x <- dplyr::rename(x, Month = .data[["Season"]])
+    if(type == "monthly") x <- dplyr::rename(x, Month = .data[["Season"]]) # nolint
     outfile <- file.path(out_dir, unique(as.character(files[[j]]$Region)), "_climate.rds")
     saveRDS(x, outfile)
   }

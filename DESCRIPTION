@@ -28,7 +28,8 @@ Imports:
     purrr,
     rgdal,
     raster,
-    rvtable
+    rvtable,
+    magrittr
 Remotes:
     leonawicz/rvtable
     leonawicz/snapmeta
