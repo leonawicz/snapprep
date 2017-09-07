@@ -32,7 +32,7 @@ clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5
   list(files = files[ord], years = yrs[ord], months = mos[ord])
 }
 
-#' Extract climate data distributions
+#' Extract climate data and compute distributions
 #'
 #' Extract climate data and estimate monthly spatial probability distributions.
 #'
@@ -99,9 +99,9 @@ clim_dist_monthly <- function(model_idx, cells, inputs, in_dir = snapdef()$ar5di
   invisible()
 }
 
-#' Extract climate data distributions
+#' Compute seasonal climate data spatial distributions
 #'
-#' Extract climate data and estimate seasonal spatial probability distributions.
+#' Compute seasonal climate data spatial probability distributions.
 #'
 #' Seasons are DJF, MAM, JJA and SON 3-month averages. A fifth "season" of full annual averages is also included.
 #' For efficiency, this function operates on outputs from \code{clim_dist_monthly}. It does not need to redundantly
@@ -156,9 +156,9 @@ clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
   invisible()
 }
 
-#' Extract climate statistics
+#' Compute climate statistics
 #'
-#' Extract climate statistics from spatial probability distributions.
+#' Compute climate statistics from spatial probability distributions.
 #'
 #' For efficiency, this function operates on outputs from \code{clim_dist_monthly} and \code{clim_dist_seasonal}.
 #' It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.

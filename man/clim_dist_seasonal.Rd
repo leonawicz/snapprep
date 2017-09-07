@@ -2,7 +2,7 @@
 % Please edit documentation in R/dist_clim_ar5.R
 \name{clim_dist_seasonal}
 \alias{clim_dist_seasonal}
-\title{Extract climate data distributions}
+\title{Compute seasonal climate data spatial distributions}
 \usage{
 clim_dist_seasonal(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
   out_dir = snapdef()$ar5dir_dist_seasonal, density.args = list(n = 200,
@@ -23,7 +23,7 @@ clim_dist_seasonal(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
 invisible, writes files.
 }
 \description{
-Extract climate data and estimate seasonal spatial probability distributions.
+Compute seasonal climate data spatial probability distributions.
 }
 \details{
 Seasons are DJF, MAM, JJA and SON 3-month averages. A fifth "season" of full annual averages is also included.

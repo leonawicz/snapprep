@@ -2,7 +2,7 @@
 % Please edit documentation in R/dist_clim_ar5.R
 \name{clim_dist_monthly}
 \alias{clim_dist_monthly}
-\title{Extract climate data distributions}
+\title{Extract climate data and compute distributions}
 \usage{
 clim_dist_monthly(model_idx, cells, inputs, in_dir = snapdef()$ar5dir,
   out_dir = snapdef()$ar5dir_dist_monthly, na.rm = TRUE,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dist_clim_ar5.R
 \name{clim_stats_ar5}
 \alias{clim_stats_ar5}
-\title{Extract climate statistics}
+\title{Compute climate statistics}
 \usage{
 clim_stats_ar5(files, type = "monthly",
   out_dir = snapdef()$ar5dir_dist_stats[1], mc.cores = 32)
@@ -20,7 +20,7 @@ clim_stats_ar5(files, type = "monthly",
 invisible, writes files.
 }
 \description{
-Extract climate statistics from spatial probability distributions.
+Compute climate statistics from spatial probability distributions.
 }
 \details{
 For efficiency, this function operates on outputs from \code{clim_dist_monthly} and \code{clim_dist_seasonal}.

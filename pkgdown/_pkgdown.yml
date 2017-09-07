@@ -12,6 +12,20 @@ authors:
     href: http://snap.uaf.edu/
     html: <img src="https://raw.githubusercontent.com/leonawicz/leonawicz.github.io/master/assets/img/snap_symbol.svg?sanitize=true" height="24" />  Scenarios Network for Alaska and Arctic Planning
 
+reference:
+- title: Package
+  contents:
+  - snapprep
+- title: Default options
+  contents:
+  - snapdef
+- title: AR5 downscaled climate
+  contents:
+  - clim_inputs_table
+  - clim_dist_monthly
+  - clim_dist_seasonal
+  - clim_stats_ar5
+
 navbar:
   type: inverse
   right:
