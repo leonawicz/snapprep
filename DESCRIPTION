@@ -22,7 +22,7 @@ Imports:
     rgdal,
     raster,
     magrittr,
-    rvtable,
+    rvtable
 Suggests: 
     testthat,
     knitr,
