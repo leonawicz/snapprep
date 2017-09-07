@@ -1,0 +1,34 @@
+Package: snapprep
+Version: 0.0.0.9000
+Title: Prepare And Curate Useful Data Sets From Raw SNAP Data
+Description: This package is used for data munging, prep and curation of useful data sets from upstream raw SNAP data sets.
+    It is a developer package useful to the author/maintainer of the SNAPverse collection of R packages.
+    Data prep done with this package serves a support role for many other SNAP projects, including the preparation of
+    data sets for SNAPverse data packages. For a user package geared toward analyzing and graphic curated SNAP data sets,
+    see the snapfuns package.
+Authors@R: c(person("Matthew", "Leonawicz", email = "mfleonawicz@alaska.edu", role = c("aut", "cre")),
+    person("Scenarios Network for Alaska and Arctic Planning", role = c("cph", "fnd"))
+    )
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+Url: https://github.com/leonawicz/snapprep
+BugReports: https://github.com/leonawicz/snapprep/issues
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown,
+    covr,
+    snapmeta
+VignetteBuilder: knitr
+Imports: 
+    dplyr,
+    tibble,
+    purrr,
+    rgdal,
+    raster,
+    rvtable
+Remotes:
+    leonawicz/rvtable
+    leonawicz/snapmeta
