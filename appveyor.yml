@@ -20,9 +20,9 @@ environment:
     USE_RTOOLS: true
 
 build_script:
+  - travis-tool.sh install_github leonawicz/rvtable
   - travis-tool.sh install_github leonawicz/snapmeta
   - travis-tool.sh install_deps
-  - travis-tool.sh install_github leonawicz/rvtable
 
 test_script:
   - travis-tool.sh run_tests
