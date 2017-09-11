@@ -5,7 +5,7 @@
 \title{Save rds files containing raster cell tables for polygons}
 \usage{
 save_poly_cells(file_akcan = "cells_akcan1km2km.rds",
-  file_ak = "cells_ak1km.rds", fileout_dir = snapdef()$celldir,
+  file_ak = "cells_ak1km.rds", out_dir = snapdef()$celldir,
   akcan1km = snapdef()$template_akcan1km,
   akcan2km = snapdef()$template_akcan2km, ak1km = snapdef()$template_ak1km,
   mc.cores = 32)
@@ -15,6 +15,8 @@ save_poly_cells(file_akcan = "cells_akcan1km2km.rds",
 
 \item{file_ak}{file name for cell index table based on the Alaska "statewide" classic ALFRESCO SNAP spatial domain.}
 
+\item{out_dir}{output directory.}
+
 \item{akcan1km}{Alaska/western Canada domain 1-km ALFRESCO template raster geotiff input file name.}
 
 \item{akcan2km}{Alaska/western Canada domain 2-km climate template raster geotiff input file name.}
@@ -22,8 +24,6 @@ save_poly_cells(file_akcan = "cells_akcan1km2km.rds",
 \item{ak1km}{Alaska domain 1-km ALFRESCO template raster geotiff input file name.}
 
 \item{mc.cores}{number of processors.}
-
-\item{out_dir}{output directory.}
 }
 \value{
 invisible, writes files.

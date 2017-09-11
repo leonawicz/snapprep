@@ -28,8 +28,11 @@ snap_poly_list <- function(domain = "akcan"){
   aklcc_ids <- as.data.frame(aklcc)[, 1]
   lcc <- snappoly::lcc
   lcc_ids <- gsub("/", "-", as.data.frame(lcc)[, 1])
+  cavm <- snappoly::cavm
   cavm_ids <- as.data.frame(cavm)[, 4]
+  fmz <- snappoly::fmz
   fmz_ids <- as.data.frame(fmz)[, 2]
+  tpa <- snappoly::tpa
   tpa_ids <- as.data.frame(tpa)[, 4]
   tpa_ids[5] <- "Departments of Defense (DOD) and Energy (DOE)"
   grp_names <- c(rep("Political Boundaries", 2), paste0("Alaska L", 3:1, " Ecoregions"),
@@ -76,7 +79,7 @@ snap_poly_list <- function(domain = "akcan"){
 #' @examples
 #' \dontrun{save_poly_cells()}
 save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cells_ak1km.rds",
-                            fileout_dir = snapdef()$celldir,
+                            out_dir = snapdef()$celldir,
                             akcan1km = snapdef()$template_akcan1km,
                             akcan2km = snapdef()$template_akcan2km,
                             ak1km = snapdef()$template_ak1km, mc.cores = 32){
@@ -111,7 +114,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
 
   polylist <- snap_poly_list(domain = "ak")
   rak1km <- raster::readAll(raster::raster(ak1km))
-  idx3 <- raster::Which(!is.na(rAK1km), cells = TRUE)
+  idx3 <- raster::Which(!is.na(rak1km), cells = TRUE)
   cells3 <-tibble::data_frame(
     Source = "ak1km", dplyr::bind_rows(
       parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = rak1km,
