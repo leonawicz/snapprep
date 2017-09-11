@@ -198,10 +198,7 @@ new cell indices based on first removing all NA-valued cells and re-indexing.</p
     
 
     <pre class="usage"><span class='fu'>save_poly_cells</span>(<span class='kw'>file_akcan</span> <span class='kw'>=</span> <span class='st'>"cells_akcan1km2km.rds"</span>,
-  <span class='kw'>file_ak</span> <span class='kw'>=</span> <span class='st'>"cells_ak1km.rds"</span>, <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>celldir</span>,
-  <span class='kw'>akcan1km</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>template_akcan1km</span>,
-  <span class='kw'>akcan2km</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>template_akcan2km</span>, <span class='kw'>ak1km</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>template_ak1km</span>,
-  <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
+  <span class='kw'>file_ak</span> <span class='kw'>=</span> <span class='st'>"cells_ak1km.rds"</span>, <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>celldir</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -219,18 +216,6 @@ new cell indices based on first removing all NA-valued cells and re-indexing.</p
       <td><p>output directory.</p></td>
     </tr>
     <tr>
-      <th>akcan1km</th>
-      <td><p>Alaska/western Canada domain 1-km ALFRESCO template raster geotiff input file name.</p></td>
-    </tr>
-    <tr>
-      <th>akcan2km</th>
-      <td><p>Alaska/western Canada domain 2-km climate template raster geotiff input file name.</p></td>
-    </tr>
-    <tr>
-      <th>ak1km</th>
-      <td><p>Alaska domain 1-km ALFRESCO template raster geotiff input file name.</p></td>
-    </tr>
-    <tr>
       <th>mc.cores</th>
       <td><p>number of processors.</p></td>
     </tr>
@@ -239,6 +224,10 @@ new cell indices based on first removing all NA-valued cells and re-indexing.</p
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>invisible, writes files.</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Note that this function also folds in buffered FMO area unions from `snapgrid::swfmoBuffer` for the Alaska domain.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -252,6 +241,8 @@ new cell indices based on first removing all NA-valued cells and re-indexing.</p
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>
