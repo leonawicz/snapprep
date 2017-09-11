@@ -22,7 +22,9 @@ Imports:
     rgdal,
     raster,
     magrittr,
-    rvtable
+    rvtable,
+    snappoly,
+    snapgrid
 Suggests: 
     testthat,
     knitr,
@@ -31,6 +33,8 @@ Suggests:
     snapmeta
 Remotes:
     leonawicz/rvtable,
-    leonawicz/snapmeta
+    leonawicz/snapmeta,
+    leonawicz/snappoly,
+    leonawicz/snapgrid
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
