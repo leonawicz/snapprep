@@ -22,8 +22,8 @@ snap_poly_list <- function(domain = "akcan"){
   ecoreg9 <- maptools::unionSpatialPolygons(ecoreg, ecoreg@data$LEVEL_2)
   ecoreg3 <- maptools::unionSpatialPolygons(ecoreg, ecoreg@data$LEVEL_1)
   ecoreg_ids <- gsub("\\.", "", as.data.frame(ecoreg)[, 1])
-  ecoreg9_ids <- sapply(slot(ecoreg9, "polygons"), function(x) slot(x, "ID"))
-  ecoreg3_ids <- sapply(slot(ecoreg3, "polygons"), function(x) slot(x, "ID"))
+  ecoreg9_ids <- sapply(methods::slot(ecoreg9, "polygons"), function(x) methods::slot(x, "ID"))
+  ecoreg3_ids <- sapply(methods::slot(ecoreg3, "polygons"), function(x) methods::slot(x, "ID"))
   aklcc <- snappoly::aklcc
   aklcc_ids <- as.data.frame(aklcc)[, 1]
   lcc <- snappoly::lcc
@@ -49,7 +49,7 @@ snap_poly_list <- function(domain = "akcan"){
   list(poly_list = poly_list, poly_names = poly_names, group_names = grp_names)
 }
 
-.get_poly_cells <- function(i, r, shp, grp, loc, idx = Which(!is.na(r), cells = TRUE)){
+.get_poly_cells <- function(i, r, shp, grp, loc, idx = raster::Which(!is.na(r), cells = TRUE)){
   stopifnot(length(shp) == length(grp) & length(shp) == length(loc))
   x <- raster::extract(r, shp[[i]], cellnumbers = TRUE)
   stopifnot(length(x) == length(loc[[i]]))
@@ -91,13 +91,13 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   polylist <- snap_poly_list()
   cells1 <- tibble::data_frame(
     Source = "akcan1km", dplyr::bind_rows(
-      parallel::mclapply(seq_long(polylist$poly_list), .get_poly_cells, r = r1km,
+      parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = r1km,
                          shp = polylist$poly_list, grp = polylist$grp_names,
                          loc = polylist$poly_names, idx = idx1, mc.cores = mc.cores)))
   cells1 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan1km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx1), cells1) %>%
     dplyr::group_by(.data[["Location"]]) %>%
-    dplyr::mutate(Cell_rmNA = which(c(1:ncell(r1km) %in% .data[["Cell"]])[idx1]))
+    dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(r1km) %in% .data[["Cell"]])[idx1]))
   cells2 <- tibble::data_frame(
     Source = "akcan2km", dplyr::bind_rows(
       parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = r2km,
@@ -106,7 +106,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   cells2 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan2km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx2), cells2) %>%
     dplyr::group_by(.data[["Location"]]) %>%
-    dplyr::mutate(Cell_rmNA = which(c(1:ncell(r2km) %in% .data[["Cell"]])[idx2]))
+    dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(r2km) %in% .data[["Cell"]])[idx2]))
 
   cells <- dplyr::bind_rows(cells1, cells2) %>%
     dplyr::group_by(.data[["Source"]], .data[["LocGroup"]], .data[["Location"]])
@@ -123,7 +123,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   cells3 <- dplyr::bind_rows(tibble::data_frame(
     Source = "ak1km", LocGroup = "Statewide", Location = "AK", Cell = idx3), cells3) %>%
     dplyr::group_by(.data[["Location"]]) %>%
-    dplyr::mutate(Cell_rmNA = which(c(1:ncell(rak1km) %in% .data[["Cell"]])[idx3])) %>%
+    dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(rak1km) %in% .data[["Cell"]])[idx3])) %>%
     dplyr::group_by(.data[["Source"]], .data[["LocGroup"]], .data[["Location"]])
   saveRDS(cells3, file = file.path(out_dir, file_ak))
   invisible()

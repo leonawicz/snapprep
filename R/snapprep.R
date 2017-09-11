@@ -18,6 +18,7 @@ globalVariables(c(".x", ".y", ".data"))
 NULL
 
 #' @importFrom magrittr %>%
+#' @importFrom methods slot
 NULL
 
 #' A function that returns a list of SNAP defaults such as path names to data sets and lists of available climate variables and models, etc.
