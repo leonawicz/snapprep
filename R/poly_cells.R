@@ -65,12 +65,12 @@ snap_poly_list <- function(domain = "akcan"){
 #' with SNAP template raster layers. Indices are stored for two conditions: matching to all raster cell indices and matching to
 #' new cell indices based on first removing all NA-valued cells and re-indexing.
 #'
+#' Note that this function also folds in buffered FMO area unions from `snapgrid::swfmoBuffer` for the Alaska domain.
+#'
+#'
 #' @param file_akcan file name for cell index table based on the Alaska/western Canada SNAP spatial domain.
 #' @param file_ak file name for cell index table based on the Alaska "statewide" classic ALFRESCO SNAP spatial domain.
 #' @param out_dir output directory.
-#' @param akcan1km Alaska/western Canada domain 1-km ALFRESCO template raster geotiff input file name.
-#' @param akcan2km Alaska/western Canada domain 2-km climate template raster geotiff input file name.
-#' @param ak1km Alaska domain 1-km ALFRESCO template raster geotiff input file name.
 #' @param mc.cores number of processors.
 #'
 #' @return invisible, writes files.
@@ -79,12 +79,9 @@ snap_poly_list <- function(domain = "akcan"){
 #' @examples
 #' \dontrun{save_poly_cells()}
 save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cells_ak1km.rds",
-                            out_dir = snapdef()$celldir,
-                            akcan1km = snapdef()$template_akcan1km,
-                            akcan2km = snapdef()$template_akcan2km,
-                            ak1km = snapdef()$template_ak1km, mc.cores = 32){
-  r1km <- raster::readAll(raster::raster(akcan1km))
-  r2km <- raster::readAll(raster::raster(akcan2km))
+                            out_dir = snapdef()$celldir, mc.cores = 32){
+  r1km <- snapgrid::akcan1km
+  r2km <- snapgrid::akcan2km
   idx1 <- raster::Which(!is.na(r1km), cells = TRUE)
   idx2 <- raster::Which(!is.na(r2km), cells = TRUE)
 
@@ -113,18 +110,21 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   saveRDS(cells, file = file.path(out_dir, file_akcan))
 
   polylist <- snap_poly_list(domain = "ak")
-  rak1km <- raster::readAll(raster::raster(ak1km))
+  rak1km <- snapgrid::ak1km
   idx3 <- raster::Which(!is.na(rak1km), cells = TRUE)
   cells3 <-tibble::data_frame(
     Source = "ak1km", dplyr::bind_rows(
       parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = rak1km,
                          shp = polylist$poly_list, grp = polylist$grp_names,
                          loc = polylist$poly_names, idx = idx3, mc.cores = mc.cores)))
-  cells3 <- dplyr::bind_rows(tibble::data_frame(
-    Source = "ak1km", LocGroup = "Statewide", Location = "AK", Cell = idx3), cells3) %>%
+  rfmo1km <- raster::readAll(snapgrid::swfmoBuffer)
+  idx4 <- raster::Which(rfmo1km %in% 2:4, cells = TRUE) # union of modified/critical/full FMO 15-km buffers
+  cells4 <- tibble::data_frame(Source = "ak1km", LocGroup = "FMO", Location = "MFC buffers", Cell = idx4)
+  cells <- dplyr::bind_rows(tibble::data_frame(
+    Source = "ak1km", LocGroup = "Statewide", Location = "AK", Cell = idx3), cells3, cells4) %>%
     dplyr::group_by(.data[["Location"]]) %>%
     dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(rak1km) %in% .data[["Cell"]])[idx3])) %>%
     dplyr::group_by(.data[["Source"]], .data[["LocGroup"]], .data[["Location"]])
-  saveRDS(cells3, file = file.path(out_dir, file_ak))
+  saveRDS(cells, file = file.path(out_dir, file_ak))
   invisible()
 }
