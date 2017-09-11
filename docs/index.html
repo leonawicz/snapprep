@@ -107,7 +107,7 @@
       <a href="http://leonawicz.github.io/snappoly">snappoly</a>
     </li>
     <li>
-      <a href="http://leonawicz.github.io/snapmaps">snapmaps</a>
+      <a href="http://leonawicz.github.io/snapgrid">snapmaps</a>
     </li>
     <li>
       <a href="http://leonawicz.github.io/snapdist">snapdist</a>
@@ -179,6 +179,15 @@
 
 <p>The <code>snapprep</code> package contains R functions used to support a wide range of SNAP projects by preparing and curating useful data sets from upstream raw SNAP data. The data sets compiled with the aid of <code>snapprep</code> are then made avaible to other projects. This includes compiling data sets that are contained in SNAPverse data packages.</p>
 <p><code>snapprep</code> is a developer package used by the SNAPverse author and maintainer. For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages, see the <code>snapfuns</code> package instead.</p>
+<div id="use-case-examples" class="section level2">
+<h2 class="hasAnchor">
+<a href="#use-case-examples" class="anchor"></a>Use case examples</h2>
+<p>Examples of some of the processing chains that <code>snapprep</code> is involved in include:</p>
+<ul>
+<li>Preparing climate distributions data frames for the <code>climdist</code> Shiny app.</li>
+<li>Compiling data frames of cell indices of the intersection of commonly used SNAP polygon shapefiles with common rasterized map layers for subsequent efficient processing of large data extraction tasks.</li>
+</ul>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>

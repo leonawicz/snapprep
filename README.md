@@ -9,6 +9,14 @@ The `snapprep` package contains R functions used to support a wide range of SNAP
 
 `snapprep` is a developer package used by the SNAPverse author and maintainer. For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages, see the `snapfuns` package instead.
 
+Use case examples
+-----------------
+
+Examples of some of the processing chains that `snapprep` is involved in include:
+
+-   Preparing climate distributions data frames for the `climdist` Shiny app.
+-   Compiling data frames of cell indices of the intersection of commonly used SNAP polygon shapefiles with common rasterized map layers for subsequent efficient processing of large data extraction tasks.
+
 Installation
 ------------
 
