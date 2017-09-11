@@ -21,10 +21,12 @@ Imports:
     purrr,
     rgdal,
     raster,
+    maptools,
     magrittr,
     rvtable,
     snappoly,
-    snapgrid
+    snapgrid,
+    methods
 Suggests: 
     testthat,
     knitr,
