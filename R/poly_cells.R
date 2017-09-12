@@ -56,7 +56,7 @@ snap_poly_list <- function(domain = "akcan"){
   purrr::map(seq_along(x), ~(
     if(!is.null(x[[.x]])) tibble::data_frame(
     LocGroup = grp[i], Location = loc[[i]][.x], Cell = sort(intersect(x[[.x]][, 1], idx))) else NULL)) %>%
-    dplyr::bind_rows(x)
+    dplyr::bind_rows()
 }
 
 #' Save rds files containing raster cell tables for polygons
