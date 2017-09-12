@@ -78,7 +78,6 @@ snap_poly_list <- function(domain = "akcan"){
 #'
 #' @examples
 #' \dontrun{save_poly_cells()}
-#'
 save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cells_ak1km.rds",
                             out_dir = snapdef()$celldir, mc.cores = 32){
   r1km <- snapgrid::akcan1km
