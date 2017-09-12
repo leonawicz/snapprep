@@ -87,25 +87,24 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   idx2 <- raster::Which(!is.na(r2km), cells = TRUE)
 
   polylist <- snap_poly_list()
-  cells1 <- tibble::data_frame(
-    Source = "akcan1km", dplyr::bind_rows(
-      parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = r1km,
-                         shp = polylist$poly_list, grp = polylist$group_names,
-                         loc = polylist$poly_names, idx = idx1, mc.cores = mc.cores)))
+  cells1 <- parallel::mclapply(
+    seq_along(polylist$poly_list), .get_poly_cells, r = r1km,
+    shp = polylist$poly_list, grp = polylist$group_names,
+    loc = polylist$poly_names, idx = idx1, mc.cores = mc.cores) %>% dplyr::bind_rows() %>%
+    dplyr::mutate(Source = "akcan1km")
   cells1 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan1km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx1), cells1) %>%
     dplyr::group_by(.data[["Location"]]) %>%
     dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(r1km) %in% .data[["Cell"]])[idx1]))
-  cells2 <- tibble::data_frame(
-    Source = "akcan2km", dplyr::bind_rows(
-      parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = r2km,
-                         shp = polylist$poly_list, grp = polylist$group_names,
-                         loc = polylist$poly_names, idx = idx2, mc.cores = mc.cores)))
+  cells2 <- parallel::mclapply(
+    seq_along(polylist$poly_list), .get_poly_cells, r = r2km,
+    shp = polylist$poly_list, grp = polylist$group_names,
+    loc = polylist$poly_names, idx = idx2, mc.cores = mc.cores) %>% dplyr::bind_rows() %>%
+    dplyr::mutate(Source = "akcan2km")
   cells2 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan2km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx2), cells2) %>%
     dplyr::group_by(.data[["Location"]]) %>%
     dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(r2km) %in% .data[["Cell"]])[idx2]))
-
   cells <- dplyr::bind_rows(cells1, cells2) %>%
     dplyr::group_by(.data[["Source"]], .data[["LocGroup"]], .data[["Location"]])
   saveRDS(cells, file = file.path(out_dir, file_akcan))
@@ -113,11 +112,11 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   polylist <- snap_poly_list(domain = "ak")
   rak1km <- snapgrid::ak1km
   idx3 <- raster::Which(!is.na(rak1km), cells = TRUE)
-  cells3 <-tibble::data_frame(
-    Source = "ak1km", dplyr::bind_rows(
-      parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = rak1km,
-                         shp = polylist$poly_list, grp = polylist$group_names,
-                         loc = polylist$poly_names, idx = idx3, mc.cores = mc.cores)))
+  cells3 <- parallel::mclapply(
+    seq_along(polylist$poly_list), .get_poly_cells, r = rak1km,
+    shp = polylist$poly_list, grp = polylist$group_names,
+    loc = polylist$poly_names, idx = idx3, mc.cores = mc.cores) %>% dplyr::bind_rows() %>%
+    dplyr::mutate(Source = "ak1km")
   rfmo1km <- raster::readAll(snapgrid::swfmoBuffer)
   idx4 <- raster::Which(rfmo1km %in% 2:4, cells = TRUE) # union of modified/critical/full FMO 15-km buffers
   cells4 <- tibble::data_frame(Source = "ak1km", LocGroup = "FMO", Location = "MFC buffers", Cell = idx4)
