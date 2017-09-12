@@ -94,7 +94,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
     dplyr::mutate(Source = "akcan1km")
   cells1 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan1km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx1), cells1) %>%
-    dplyr::group_by(.data[["Location"]]) %>%
+    dplyr::group_by(.data[["LocGroup"]], .data[["Location"]]) %>%
     dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(r1km) %in% .data[["Cell"]])[idx1]))
   cells2 <- parallel::mclapply(
     seq_along(polylist$poly_list), .get_poly_cells, r = r2km,
@@ -103,7 +103,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
     dplyr::mutate(Source = "akcan2km")
   cells2 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan2km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx2), cells2) %>%
-    dplyr::group_by(.data[["Location"]]) %>%
+    dplyr::group_by(.data[["LocGroup"]], .data[["Location"]]) %>%
     dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(r2km) %in% .data[["Cell"]])[idx2]))
   cells <- dplyr::bind_rows(cells1, cells2) %>%
     dplyr::group_by(.data[["Source"]], .data[["LocGroup"]], .data[["Location"]])
@@ -122,7 +122,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   cells4 <- tibble::data_frame(Source = "ak1km", LocGroup = "FMO", Location = "MFC buffers", Cell = idx4)
   cells <- dplyr::bind_rows(tibble::data_frame(
     Source = "ak1km", LocGroup = "Statewide", Location = "AK", Cell = idx3), cells3, cells4) %>%
-    dplyr::group_by(.data[["Location"]]) %>%
+    dplyr::group_by(.data[["LocGroup"]], .data[["Location"]]) %>%
     dplyr::mutate(Cell_rmNA = which(c(1:raster::ncell(rak1km) %in% .data[["Cell"]])[idx3])) %>%
     dplyr::group_by(.data[["Source"]], .data[["LocGroup"]], .data[["Location"]])
   saveRDS(cells, file = file.path(out_dir, file_ak))
