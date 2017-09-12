@@ -78,6 +78,7 @@ snap_poly_list <- function(domain = "akcan"){
 #'
 #' @examples
 #' \dontrun{save_poly_cells()}
+#'
 save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cells_ak1km.rds",
                             out_dir = snapdef()$celldir, mc.cores = 32){
   r1km <- snapgrid::akcan1km
@@ -89,7 +90,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   cells1 <- tibble::data_frame(
     Source = "akcan1km", dplyr::bind_rows(
       parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = r1km,
-                         shp = polylist$poly_list, grp = polylist$grp_names,
+                         shp = polylist$poly_list, grp = polylist$group_names,
                          loc = polylist$poly_names, idx = idx1, mc.cores = mc.cores)))
   cells1 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan1km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx1), cells1) %>%
@@ -98,7 +99,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   cells2 <- tibble::data_frame(
     Source = "akcan2km", dplyr::bind_rows(
       parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = r2km,
-                         shp = polylist$poly_list, grp = polylist$grp_names,
+                         shp = polylist$poly_list, grp = polylist$group_names,
                          loc = polylist$poly_names, idx = idx2, mc.cores = mc.cores)))
   cells2 <- dplyr::bind_rows(tibble::data_frame(
     Source = "akcan2km", LocGroup = "Political Boundaries", Location = "AK-CAN", Cell = idx2), cells2) %>%
@@ -115,7 +116,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
   cells3 <-tibble::data_frame(
     Source = "ak1km", dplyr::bind_rows(
       parallel::mclapply(seq_along(polylist$poly_list), .get_poly_cells, r = rak1km,
-                         shp = polylist$poly_list, grp = polylist$grp_names,
+                         shp = polylist$poly_list, grp = polylist$group_names,
                          loc = polylist$poly_names, idx = idx3, mc.cores = mc.cores)))
   rfmo1km <- raster::readAll(snapgrid::swfmoBuffer)
   idx4 <- raster::Which(rfmo1km %in% 2:4, cells = TRUE) # union of modified/critical/full FMO 15-km buffers
