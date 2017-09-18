@@ -34,6 +34,7 @@ snapdef <- function(){
   alfex <- "/atlas_scratch/mfleonawicz/alfresco"
   mldat <- "/workspace/UA/mfleonawicz/data"
   list(
+    dist_dir = mldat,
     ar5dir = "/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/downscaled",
     ar5dir_dist_monthly = file.path(mldat, "clim_2km_monthly"),
     ar5dir_dist_seasonal = file.path(mldat, "clim_2km_seasonal"),
