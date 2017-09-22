@@ -6,3 +6,88 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE, error = FALSE, tidy = TRUE
+)
+library(snapprep)
+```
+
+The `snapprep` R package is used by the package author/maintainer primarily to prepare and curate data sets for downstream use in other SNAP projects and R packages. It is a developer package not made for other users in general. However, this vignette documents some of the data prep pipelines facilitated by `snapprep`, which can make various types of data munging from raw/source SNAP data files to more useful, manageable and meaningful curated data sets that cater to specific projects and analysis objectives a more seamless process.
+
+## Climate distributions
+
+There is not much to show in terms of code, but this is the intent of `snapprep`. It encapsulates the heavy lifting of procedures like climate variable probability distribution modeling in package functions and the package includes standard default options for working with source data located on the SNAP network.
+
+### Monthly data
+
+First, you can generate a table of available combinations of climate models, CRU data, emissions scenarios (RCPs) and climate variables.
+On the Atlas cluster, you do not have to pass an explicit directory unless you want to override the default.
+The package knows where the standard outputs are stored.
+Note that in terms of outputs, you have to provide a directory. You will not have permissions to write to the default.
+Since this needs to be run on the Atlas cluster, this vignette cannot print the output for you here.
+
+```{r clim_table, eval = FALSE}
+library(snapprep)
+x <- clim_inputs_table()
+x
+```
+
+Now you are ready to extract data from SNAP's downscaled CMIP5 Alaska/western Canada maps collection.
+This will take a while to run if you are planning to process every data set (every row of `x`).
+It will process in parallel over years using 32 CPUs on an Atlas compute node by default.
+The call below to `clim_dist_monthly` extracts monthly data for all years from whatever climate models (plus CRU), 
+historical period and RCPs, and climate variables (min, mean and max temperature, and precipitation)
+are passed via `x`.
+
+```{r cmip5_monthly, eval = FALSE}
+purrr::map(x, ~clim_dist_monthly(.x))
+```
+
+This saves .rds files containing data frames of modeled probability density functions for spatial distributions 
+of climate variables for all these source data sets.
+Outputs are saved to a directory containing groups of regions. Each region group contains subdirectories of related subregions.
+These directories contain the .rds files.
+
+The regions for which spatial distributions are estimated are taken from 
+the 2-km level locations listed in `snapdef()$cells_akcan1km2km`, which is made by `snapprep::save_poly_cells` and
+itself uses common SNAP polygons that can be found in the `snappoly` SNAPverse data package.
+
+## Seasonal and annual data
+
+Modeling seasonal and annual temporal resolution distributions does not require revisiting the source downscaled geotiff files.
+That brute force approach of aggregating the source data to seasonal and annual averages would be a waste of time and effort.
+The sensible approach is to estimate seasonal and annual distributions from the already estimated monthly distributions.
+Those outputs now become your inputs. The further you get from the source data as you continue down the processing pipeline,
+the faster the processing will go. 
+
+`clim_dist_seasonal` does not do parallel processing internally. You can wrap it in `mclapply`.
+This is expected. Its first argument is the iterator index.
+Annual is included as a "season" in the outputs from this function.
+There is a one-to-one correspondence between monthly and seasonal files. `files` is simply a list of all the files
+created by `clim_dist_monthly`.
+
+```{r cmip5_seasonal, eval = FALSE}
+in_dir <- snapdef()$ar5dir_dist_monthly
+files_monthly <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
+parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files_monthly)
+```
+
+Like the monthly outputs, now you have seasonal (and annual) climate variable distributions.
+The next step is to produce statistics from these distributions, which are useful and efficient for projects requiring specific statistics
+and not the need for general distributional information.
+The following function can be applied to both monthly and seasonal outputs.
+It offers internal parallel processing, again defaulting to the full 32 CPUs available on an Atlas compute node.
+
+```{r cmip5_stats, eval = FALSE}
+in_dir2 <- snapdef()$ar5dir_dist_seasonal
+files_seasonal <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
+parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files)
+clim_stats_ar5(files_monthly, type = "monthly")
+clim_stats_ar5(files_seasonal, type = "seasonal")
+```
+
+Make sure to read the documentation on these functions. You should be familiar with their arguments, including any not shown in this vignette.
+If you apply these functions to a large amount of data, it is also good practice to run the job in non-interactive mode via a SLURM
+job manager script, in case of disconnection.
