@@ -225,9 +225,11 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>clim_inputs_table</span>()
-<span class='co'># }</span></pre>
+    <pre class="examples"># NOT RUN {
+clim_inputs_table() %>%
+  filter(!(model == "ts40" & var %in% c("tasmin", "tasmax"))))
+# }
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
