@@ -4,18 +4,13 @@
 \alias{clim_dist_monthly}
 \title{Extract climate data and compute distributions}
 \usage{
-clim_dist_monthly(model_idx, cells, inputs, in_dir = snapdef()$ar5dir,
+clim_dist_monthly(inputs, in_dir = snapdef()$ar5dir,
   out_dir = snapdef()$ar5dir_dist_monthly, na.rm = TRUE,
   density.args = list(n = 200, adjust = 0.1), sample.size = 10000,
-  verbose = TRUE, overwrite = FALSE)
+  verbose = TRUE, overwrite = FALSE, move_akcan = TRUE, mc.cores = 32)
 }
 \arguments{
-\item{model_idx}{iterator, model index in list of climate models/directories.}
-
-\item{cells}{data frame of grid cells in raster maps corresponding to various standard SNAP spatial polygons,
-e.g., the table from \code{snapdef()$akcan1km2km}.}
-
-\item{inputs}{data frame of inputs. See \code{clim_inputs_table}.}
+\item{inputs}{data frame of inputs (one row). See details.}
 
 \item{in_dir}{input directory, e.g., \code{snapdef()$ar5dir}.}
 
@@ -30,6 +25,10 @@ e.g., the table from \code{snapdef()$akcan1km2km}.}
 \item{verbose}{logical, verbose progress.}
 
 \item{overwrite}{logical, overwrite existing files.}
+
+\item{move_akcan}{logical, relocate the \code{AK-CAN} domain from \code{Political Boundaries} subdirectory to top level as its own location group.}
+
+\item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \value{
 invisible, writes files.
@@ -37,7 +36,13 @@ invisible, writes files.
 \description{
 Extract climate data and estimate monthly spatial probability distributions.
 }
+\details{
+\code{inputs} generally comes from \link{clim_inputs_table}. \code{clim_dist_monthly} processes data sets referred to by
+one row of this data frame at a time. Internally processing uses 32 CPUs on an Atlas compute node. It is expected that the different
+data sets in the full \code{inputs} be processed serially. See example call below.
+}
 \examples{
-\dontrun{mclapply(1:nrow(inputs), get_data, cells = cells,
-  inputs = inputs, in_dir = getwd(), out_dir = out_dir, mc.cores = 2)}
+\dontrun{
+purrr::map(1:nrow(inputs), ~get_data(.x, inputs = inputs)
+}
 }

@@ -24,5 +24,8 @@ This function creates a data frame of inputs used for climate data extraction fr
 Default arguments are those in the \code{snapdef()} defaults list.
 }
 \examples{
-\dontrun{clim_inputs_table()}
+\dontrun{
+clim_inputs_table() \%>\%
+  filter(!(model == "ts40" & var \%in\% c("tasmin", "tasmax"))))
+}
 }

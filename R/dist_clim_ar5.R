@@ -12,10 +12,14 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{clim_inputs_table()}
+#' \dontrun{
+#' clim_inputs_table() %>%
+#'   filter(!(model == "ts40" & var %in% c("tasmin", "tasmax"))))
+#' }
 clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5var,
                               models = snapdef()$ar5all){
-  rcps <- purrr::map(models, ~rep(list.files(.x), each = length(vars))) %>% purrr::map(~.x[.x != "rcp26"])
+  rcps <- purrr::map(models, ~rep(list.files(file.path(base_path, .x)), each = length(vars))) %>%
+    purrr::map(~.x[.x != "rcp26"])
   models <- purrr::map2(models, rcps, ~rep(.x, each = length(.y)))
   vars <- purrr::map(models, ~rep(vars, length = length(.x)))
   zero.min <- purrr::map(vars, ~.x == "pr")
@@ -23,7 +27,7 @@ clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5
                      var = unlist(vars), zero = unlist(zero.min))
 }
 
-.get_clim_files <- function(rcp, model, variable, dir = getwd()){
+.get_clim_files <- function(rcp, model, variable, dir){
   files <- list.files(file.path(dir, model, rcp, variable), pattern=".tif$", full.names = TRUE)
   n <- nchar(files)
   yrs <- as.numeric(substr(files, n - 7, n - 4))
@@ -36,10 +40,11 @@ clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5
 #'
 #' Extract climate data and estimate monthly spatial probability distributions.
 #'
-#' @param model_idx iterator, model index in list of climate models/directories.
-#' @param cells data frame of grid cells in raster maps corresponding to various standard SNAP spatial polygons,
-#' e.g., the table from \code{snapdef()$akcan1km2km}.
-#' @param inputs data frame of inputs. See \code{clim_inputs_table}.
+#' \code{inputs} generally comes from \link{clim_inputs_table}. \code{clim_dist_monthly} processes data sets referred to by
+#' one row of this data frame at a time. Internally processing uses 32 CPUs on an Atlas compute node. It is expected that the different
+#' data sets in the full \code{inputs} be processed serially. See example call below.
+#'
+#' @param inputs data frame of inputs (one row). See details.
 #' @param in_dir input directory, e.g., \code{snapdef()$ar5dir}.
 #' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_dist_monthly}
 #' @param na.rm logical, remove NAs.
@@ -47,34 +52,45 @@ clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5
 #' @param sample.size numeric, sample size.
 #' @param verbose logical, verbose progress.
 #' @param overwrite logical, overwrite existing files.
+#' @param move_akcan logical, relocate the \code{AK-CAN} domain from \code{Political Boundaries} subdirectory to top level as its own location group.
+#' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @return invisible, writes files.
 #' @export
 #'
 #' @examples
-#' \dontrun{mclapply(1:nrow(inputs), get_data, cells = cells,
-#'   inputs = inputs, in_dir = getwd(), out_dir = out_dir, mc.cores = 2)}
-clim_dist_monthly <- function(model_idx, cells, inputs, in_dir = snapdef()$ar5dir,
+#' \dontrun{
+#' purrr::map(1:nrow(inputs), ~get_data(.x, inputs = inputs)
+#' }
+clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
                               out_dir = snapdef()$ar5dir_dist_monthly,
                               na.rm = TRUE, density.args = list(n = 200, adjust = 0.1),
-                              sample.size = 10000, verbose = TRUE, overwrite = FALSE){
-  verbose <- if(verbose & model_idx == 1) TRUE else FALSE
-  inputs <- inputs[model_idx, ]
+                              sample.size = 10000, verbose = TRUE, overwrite = FALSE,
+                              move_akcan = TRUE, mc.cores = 32){
+  if(nrow(inputs) != 1)
+    stop("`inputs` must be a single-row data frame (one row from `clim_inputs_table`).")
+  cells <- readRDS(snapdef()$cells_akcan1km2km) %>%
+    dplyr::filter(.data[["Source"]] == "akcan2km")
+  verbose <- if(verbose) TRUE else FALSE
   rcp <- inputs$rcp
   model <- inputs$model
   variable <- inputs$var
   zero.min <- inputs$zero
   files <- .get_clim_files(rcp, model, variable, in_dir)
-  x0 <- as.matrix(raster::stack(files$files, quick=TRUE))
-  if(verbose) print("Matrix in memory...")
+  x0 <- raster::as.matrix(raster::stack(files$files, quick=TRUE))
+  if(verbose) cat("Matrix in memory...\n")
   if(na.rm) x0 <- x0[!is.na(x0[, 1]), ]
   for(i in unique(cells$LocGroup)){
     cells.i <- dplyr::filter(cells, .data[["LocGroup"]] == i) # nolint
     for(j in unique(cells.i$Location)){
-      dir.create(grpDir <- file.path(out_dir, i,  j), showWarnings = FALSE, recursive = TRUE)
+      if(move_akcan & i == "AK-CAN" & j == "Political Boundaries"){
+        dir.create(grpDir <- file.path(out_dir, "AK-CAN", j), showWarnings = FALSE, recursive = TRUE)
+      } else {
+        dir.create(grpDir <- file.path(out_dir, i,  j), showWarnings = FALSE, recursive = TRUE)
+      }
       file <- paste0(grpDir, "/", variable, "_", rcp, "_", model, ".rds")
       if(!overwrite && exists(file)) next
-      if(verbose) print(paste("Compiling data for", j, "..."))
+      if(verbose) cat(paste("Compiling data for", j, "...\n"))
       cells.ij <- dplyr::filter(cells.i, .data[["Location"]] == j) # nolint
       idx <- if(na.rm) cells.ij$Cell_rmNA else cells.ij$Cell
       x <- x0[idx, ]
@@ -85,8 +101,8 @@ clim_dist_monthly <- function(model_idx, cells, inputs, in_dir = snapdef()$ar5di
       x <- as.numeric(x)
       x <- split(x, paste(yrs, c(paste0(0, 1:9), 10:12)[mos]))
       nam <- names(x)
-      if(verbose) print(paste("Number of time slices:", length(nam)))
-      x <- parallel::mclapply(x, rvtable::rvtable, density.args = density.args, mc.cores = 32)
+      if(verbose) cat(paste0("Number of time slices: ", length(nam), "\n"))
+      x <- parallel::mclapply(x, rvtable::rvtable, density.args = density.args, mc.cores = mc.cores)
       x <- purrr::map2(x, nam, ~dplyr::mutate(
         .x, Year = as.integer(substr(.y, 1, 4)), # nolint
         Month = as.integer(substr(.y, 6, 7)))) %>% # nolint
@@ -117,8 +133,10 @@ clim_dist_monthly <- function(model_idx, cells, inputs, in_dir = snapdef()$ar5di
 #' @export
 #'
 #' @examples
-#' \dontrun{mclapply(seq_along(files), clim_dist_seasonal,
-#'   files = files, out_dir = out_dir, mc.cores = 32)}
+#' \dontrun{
+#' mclapply(seq_along(files), clim_dist_seasonal,
+#'  files = files, mc.cores = 32)
+#'  }
 clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
                                out_dir = snapdef()$ar5dir_dist_seasonal,
                                density.args = list(n = 200, adjust = 0.1)){

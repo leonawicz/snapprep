@@ -31,6 +31,8 @@ For efficiency, this function operates on outputs from \code{clim_dist_monthly}.
 access source downscaled geotiffs.
 }
 \examples{
-\dontrun{mclapply(seq_along(files), clim_dist_seasonal,
-  files = files, out_dir = out_dir, mc.cores = 32)}
+\dontrun{
+mclapply(seq_along(files), clim_dist_seasonal,
+ files = files, mc.cores = 32)
+ }
 }
