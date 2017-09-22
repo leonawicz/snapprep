@@ -60,7 +60,7 @@ clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5
 #'
 #' @examples
 #' \dontrun{
-#' purrr::map(1:nrow(inputs), ~get_data(.x, inputs = inputs)
+#' purrr::map(1:nrow(inputs), ~clim_dist_monthly(.x))
 #' }
 clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
                               out_dir = snapdef()$ar5dir_dist_monthly,
@@ -216,7 +216,7 @@ clim_stats_ar5 <- function(files, type = "monthly", out_dir = snapdef()$ar5dir_d
     GCM = factor(factor(ifelse(.data[["GCM"]] == "ts40", "CRU 4.0", .data[["GCM"]]), levels = model_levels)),
     Season = factor(f(.data[["Season"]]), levels = season_levels))
   .stats <- function(i, files){
-    print(paste("File", i, "of", nrow(files), "..."))
+    cat(paste("File", i, "of", nrow(files), "...\n"))
     readRDS(files$files[i]) %>% rvtable::rvtable %>% rvtable::sample_rvtable %>%
       dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]]) %>%
       dplyr::summarise(
@@ -238,7 +238,6 @@ clim_stats_ar5 <- function(files, type = "monthly", out_dir = snapdef()$ar5dir_d
   files <- split(files, loc)
   for(j in seq_along(files)){
     x <- parallel::mclapply(seq_along(files[[j]]), .stats, files = files[[j]], mc.cores = mc.cores)
-    print(x)
     x <- dplyr::bind_rows(x) %>% dplyr::select(
       .data[["RCP"]], .data[["GCM"]], .data[["Region"]], .data[["Var"]], .data[["Year"]], .data[["Season"]],
       .data[["Mean"]], .data[["SD"]], .data[["Min"]], .data[["Pct_05"]], .data[["Pct_10"]], .data[["Pct_25"]],

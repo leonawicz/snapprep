@@ -43,6 +43,6 @@ data sets in the full \code{inputs} be processed serially. See example call belo
 }
 \examples{
 \dontrun{
-purrr::map(1:nrow(inputs), ~get_data(.x, inputs = inputs)
+purrr::map(1:nrow(inputs), ~clim_dist_monthly(.x))
 }
 }
