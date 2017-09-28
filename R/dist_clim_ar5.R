@@ -14,7 +14,7 @@
 #' @examples
 #' \dontrun{
 #' clim_inputs_table() %>%
-#'   filter(!(model == "ts40" & var %in% c("tasmin", "tasmax"))))
+#'   filter(!(model == "ts40" & var %in% c("tasmin", "tasmax")))
 #' }
 clim_inputs_table <- function(base_path = snapdef()$ar5dir, vars = snapdef()$ar5var,
                               models = snapdef()$ar5all){
