@@ -85,7 +85,7 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
   for(i in unique(cells$LocGroup)){
     cells.i <- dplyr::filter(cells, .data[["LocGroup"]] == i) # nolint
     for(j in unique(cells.i$Location)){
-      if(move_akcan & i == "AK-CAN" & j == "Political Boundaries"){
+      if(move_akcan & i == "Political Boundaries" & j == "AK-CAN"){
         dir.create(grpDir <- file.path(out_dir, "AK-CAN", j), showWarnings = FALSE, recursive = TRUE)
       } else {
         dir.create(grpDir <- file.path(out_dir, i,  j), showWarnings = FALSE, recursive = TRUE)
@@ -104,12 +104,13 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
       x <- split(x, paste(yrs, c(paste0(0, 1:9), 10:12)[mos]))
       nam <- names(x)
       if(verbose) cat(paste0("Number of time slices: ", length(nam), "\n"))
-      x <- parallel::mclapply(x, rvtable::rvtable, density.args = density.args, mc.cores = mc.cores)
+      x <- parallel::mclapply(x, rvtable::rvtable, Val = "Val", Prob = "Prob", density.args = density.args, mc.cores = mc.cores)
       x <- purrr::map2(x, nam, ~dplyr::mutate(
         .x, Year = as.integer(substr(.y, 1, 4)), # nolint
         Month = as.integer(substr(.y, 6, 7)))) %>% # nolint
-        dplyr::bind_rows() %>% tibble::data_frame() %>%
-        dplyr::select(.data[["Year"]], .data[["Month"]], .data[["Val"]], .data[["Prob"]]) # nolint
+        dplyr::bind_rows() %>%
+        dplyr::select(.data[["Year"]], .data[["Month"]], .data[["Val"]], .data[["Prob"]]) %>% # nolint
+        rvtable::rvtable(density.args = density.args)
       if(zero.min && any(x$Val < 0)) warning("Density includes values less than zero.")
       saveRDS(x, file)
     }
@@ -152,11 +153,14 @@ clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
           dplyr::filter(.data[["Year"]] > yrs[1] & .data[["Year"]] <= yrs[2]) # nolint
         x <- dplyr::filter(x, .data[["Year"]] == yrs[1]) %>% dplyr::bind_rows(y) # nolint
       }
-      rvtable::rvtable(x)
+      rvtable::rvtable(x, density.args = density.args)
     }
     x <- switch(season,
-                "annual" = rvtable::rvtable(x), "winter" = .season(x, c(1, 2, 12)),
-                "spring" = .season(x, 3:5), "summer" = .season(x, 6:8), "autumn" = .season(x, 9:11))
+                "annual" = rvtable::rvtable(x, density.args = density.args),
+                "winter" = .season(x, c(1, 2, 12)),
+                "spring" = .season(x, 3:5),
+                "summer" = .season(x, 6:8),
+                "autumn" = .season(x, 9:11))
     rvtable::marginalize(x, "Month", density.args = density.args)
   }
   file <- files[i]
