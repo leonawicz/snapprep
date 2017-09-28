@@ -42,7 +42,7 @@ historical period and RCPs, and climate variables (min, mean and max temperature
 are passed via `x`.
 
 ```{r cmip5_monthly, eval = FALSE}
-purrr::map(x, ~clim_dist_monthly(.x))
+purrr::map(1:nrow(x), ~ %>% clim_dist_monthly(slice(x, .x)))
 ```
 
 This saves .rds files containing data frames of modeled probability density functions for spatial distributions 
