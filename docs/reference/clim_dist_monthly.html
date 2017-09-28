@@ -258,7 +258,8 @@ data sets in the full <code>inputs</code> be processed serially. See example cal
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/purrr/topics/map'>map</a></span>(<span class='fl'>1</span>:<span class='fu'>nrow</span>(<span class='no'>inputs</span>), ~<span class='fu'>clim_dist_monthly</span>(<span class='no'>.x</span>))
+<span class='fu'>set.seed</span>(<span class='fl'>457</span>)
+<span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/purrr/topics/map'>map</a></span>(<span class='fl'>1</span>:<span class='fu'>nrow</span>(<span class='no'>inputs</span>), ~<span class='fu'>slice</span>(<span class='no'>inputs</span>, <span class='no'>.x</span>) <span class='kw'>%&gt;%</span> <span class='fu'>clim_dist_monthly</span>())
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

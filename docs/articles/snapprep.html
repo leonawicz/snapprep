@@ -175,18 +175,18 @@
 <h2 class="hasAnchor">
 <a href="#climate-distributions" class="anchor"></a>Climate distributions</h2>
 <p>There is not much to show in terms of code, but this is the intent of <code>snapprep</code>. It encapsulates the heavy lifting of procedures like climate variable probability distribution modeling in package functions and the package includes standard default options for working with source data located on the SNAP network.</p>
-<div id="monthly-data" class="section level3">
-<h3 class="hasAnchor">
-<a href="#monthly-data" class="anchor"></a>Monthly data</h3>
+</div>
+<div id="monthly-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#monthly-data" class="anchor"></a>Monthly data</h2>
 <p>First, you can generate a table of available combinations of climate models, CRU data, emissions scenarios (RCPs) and climate variables. On the Atlas cluster, you do not have to pass an explicit directory unless you want to override the default. The package knows where the standard outputs are stored. Note that in terms of outputs, you have to provide a directory. You will not have permissions to write to the default. Since this needs to be run on the Atlas cluster, this vignette cannot print the output for you here.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(snapprep)
 x &lt;-<span class="st"> </span><span class="kw"><a href="../reference/clim_inputs_table.html">clim_inputs_table</a></span>()
 x</code></pre></div>
 <p>Now you are ready to extract data from SNAP’s downscaled CMIP5 Alaska/western Canada maps collection. This will take a while to run if you are planning to process every data set (every row of <code>x</code>). It will process in parallel over years using 32 CPUs on an Atlas compute node by default. The call below to <code>clim_dist_monthly</code> extracts monthly data for all years from whatever climate models (plus CRU), historical period and RCPs, and climate variables (min, mean and max temperature, and precipitation) are passed via <code>x</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purrr::<span class="kw">map</span>(x, ~<span class="kw"><a href="../reference/clim_dist_monthly.html">clim_dist_monthly</a></span>(.x))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purrr::<span class="kw">map</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(x), ~<span class="st"> </span>%&gt;%<span class="st"> </span><span class="kw"><a href="../reference/clim_dist_monthly.html">clim_dist_monthly</a></span>(<span class="kw">slice</span>(x, .x)))</code></pre></div>
 <p>This saves .rds files containing data frames of modeled probability density functions for spatial distributions of climate variables for all these source data sets. Outputs are saved to a directory containing groups of regions. Each region group contains subdirectories of related subregions. These directories contain the .rds files.</p>
 <p>The regions for which spatial distributions are estimated are taken from the 2-km level locations listed in <code>snapdef()$cells_akcan1km2km</code>, which is made by <code><a href="http://www.rdocumentation.org/packages/snapprep/topics/save_poly_cells">snapprep::save_poly_cells</a></code> and itself uses common SNAP polygons that can be found in the <code>snappoly</code> SNAPverse data package.</p>
-</div>
 </div>
 <div id="seasonal-and-annual-data" class="section level2">
 <h2 class="hasAnchor">
@@ -213,6 +213,7 @@ parallel::<span class="kw">mclapply</span>(<span class="kw">seq_along</span>(fil
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#climate-distributions">Climate distributions</a></li>
+      <li><a href="#monthly-data">Monthly data</a></li>
       <li><a href="#seasonal-and-annual-data">Seasonal and annual data</a></li>
       </ul>
 </div>
