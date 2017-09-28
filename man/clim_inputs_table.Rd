@@ -25,7 +25,8 @@ Default arguments are those in the \code{snapdef()} defaults list.
 }
 \examples{
 \dontrun{
+library(dplyr)
 clim_inputs_table() \%>\%
-  filter(!(model == "ts40" & var \%in\% c("tasmin", "tasmax"))))
+  filter(!(model == "ts40" & var \%in\% c("tasmin", "tasmax")))
 }
 }
