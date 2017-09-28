@@ -20,7 +20,7 @@ The `snapprep` R package is used by the package author/maintainer primarily to p
 
 There is not much to show in terms of code, but this is the intent of `snapprep`. It encapsulates the heavy lifting of procedures like climate variable probability distribution modeling in package functions and the package includes standard default options for working with source data located on the SNAP network.
 
-### Monthly data
+## Monthly data
 
 First, you can generate a table of available combinations of climate models, CRU data, emissions scenarios (RCPs) and climate variables.
 On the Atlas cluster, you do not have to pass an explicit directory unless you want to override the default.
