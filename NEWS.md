@@ -4,6 +4,7 @@
 * Updated functions and documentation for CMIP5 data extraction and density estimation functions.
 * Updated defaults in `snapdef`.
 * Add defaults unit tests.
+* Added better handling of near-zero precipitation.
 
 # snapprep 0.0.0.9000
 
