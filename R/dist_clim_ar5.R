@@ -103,14 +103,25 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
       x <- split(x, paste(yrs, c(paste0(0, 1:9), 10:12)[mos]))
       nam <- names(x)
       if(verbose) cat(paste0("Number of time slices: ", length(nam), "\n"))
-      x <- parallel::mclapply(x, rvtable::rvtable, Val = "Val", Prob = "Prob", density.args = density.args, mc.cores = mc.cores)
+
+      rvt <- function(data, Val, Prob, density.args, zero.min){
+        x <- rvtable::rvtable(data, Val = Val, Prob = Prob, density.args = density.args)
+        if(zero.min && any(x$Val < 0)){
+          density.args$from <- 0
+          x <- rvtable::rvtable(data, Val = Val, Prob = Prob, density.args = density.args)
+        }
+        x
+      }
+
+      x <- parallel::mclapply(x, rvt, Val = "Val", Prob = "Prob", density.args = density.args,
+                              zero.min = zero.min, mc.cores = mc.cores)
       x <- purrr::map2(x, nam, ~dplyr::mutate(
         .x, Year = as.integer(substr(.y, 1, 4)), # nolint
         Month = as.integer(substr(.y, 6, 7)))) %>% # nolint
         dplyr::bind_rows() %>%
         dplyr::select(.data[["Year"]], .data[["Month"]], .data[["Val"]], .data[["Prob"]]) %>% # nolint
         rvtable::rvtable(density.args = density.args)
-      if(zero.min && any(x$Val < 0)) warning("Density includes values less than zero.")
+      if(zero.min && any(x$Val < 0)) cat("Density includes values less than zero.\n")
       saveRDS(x, file)
     }
   }
