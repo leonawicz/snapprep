@@ -43,7 +43,6 @@ data sets in the full \code{inputs} be processed serially. See example call belo
 }
 \examples{
 \dontrun{
-set.seed(457)
-purrr::map(1:nrow(inputs), ~slice(inputs, .x) \%>\% clim_dist_monthly())
+purrr::walk(1:nrow(inputs), ~slice(inputs, .x) \%>\% clim_dist_monthly())
 }
 }
