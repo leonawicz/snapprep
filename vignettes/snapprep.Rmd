@@ -62,19 +62,22 @@ The sensible approach is to estimate seasonal and annual distributions from the 
 Those outputs now become your inputs. The further you get from the source data as you continue down the processing pipeline,
 the faster the processing will go. 
 
-`clim_dist_seasonal` does not do parallel processing internally. You can wrap it in `mclapply`.
-This is expected. Its first argument is the iterator index.
-Annual is included as a "season" in the outputs from this function.
-There is a one-to-one correspondence between monthly and seasonal files. `files` is simply a list of all the files
-created by `clim_dist_monthly`.
+`clim_dist_seasonal` also uses parallel processing internally.
+There is a one-to-one correspondence between monthly and seasonal files.
+Using default arguments, it is as simple as:
 
 ```{r cmip5_seasonal, eval = FALSE}
-in_dir <- snapdef()$ar5dir_dist_monthly
-files_monthly <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
-parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files_monthly)
+clim_dist_seasonal()
 ```
 
-Like the monthly outputs, now you have seasonal (and annual) climate variable distributions.
+It is recommended, however, to split the processing into multiple batches by using the `rcp` and `variable` arguments:
+
+```{r cmip5_seasonal, eval = FALSE}
+clim_dist_seasonal(rcp = "rcp60", variable = "tas")
+```
+
+The options for `rcp` include `historical`, `rcp45`, `rcp60` and `rcp85`. The options for climate variable include `pr`, `tas`, `tasmin` and `tasmax`.
+Like the monthly outputs, now you have seasonal (and annual) climate variable distributions, stored (by default) in an adjacent directory with analogous structure.
 
 ## Climate statistics
 
