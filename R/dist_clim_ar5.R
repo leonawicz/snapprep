@@ -138,8 +138,11 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #'
 #' Use \code{variable} to optionally specify a climate variable file identifier: \code{"pr"}, \code{"tas"}, \code{"tasmin"} or \code{"tasmax"}.
 #' This will be used for pattern matching when listing files inside \code{in_dir}.
+#' Similarly, use \code{rcp} to process a smaller batch.
+#' These are helpful when there are many files, such that there could be RAM or time limitations.
 #'
 #' @param variable character, optional, to split into smaller file batches. See details.
+#' @param rcp character, optional, to split into smaller file batches. See details.
 #' @param in_dir input directory, e.g., \code{snapdef()$ar5dir_dist_monthly}.
 #' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_dist_seasonal}
 #' @param density.args arguments list passed to \code{density}.
@@ -151,11 +154,13 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #' \dontrun{
 #' clim_dist_seasonal() # all variables
 #' clim_dist_seasonal(variable = "pr") # precipitation
+#' clim_dist_seasonal(variable = "pr", rcp = "rcp60") # precipitation and RCP 6.0
 #' }
-clim_dist_seasonal <- function(variable, in_dir = snapdef()$ar5dir_dist_monthly,
+clim_dist_seasonal <- function(variable, rcp, in_dir = snapdef()$ar5dir_dist_monthly,
                                out_dir = snapdef()$ar5dir_dist_seasonal,
                                density.args = list(n = 200, adjust = 0.1), mc.cores = 32){
-  pat <- if(missing(variable)) ".rds$" else paste0("^", variable, ".*.rds$")
+  pat <- if(missing(rcp)) ".rds$" else paste0(rcp, ".*.rds$")
+  pat <- if(missing(variable)) pat else paste0("^", variable, ".*.", pat)
   files <- list.files(in_dir, pattern = pat, recursive = TRUE)
 
   .seasonal <- function(x, season, density.args){
