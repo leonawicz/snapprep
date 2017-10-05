@@ -75,6 +75,9 @@ parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files_monthly)
 ```
 
 Like the monthly outputs, now you have seasonal (and annual) climate variable distributions.
+
+## Climate statistics
+
 The next step is to produce statistics from these distributions, which are useful and efficient for projects requiring specific statistics
 and not the need for general distributional information.
 The following function can be applied to both monthly and seasonal outputs.
