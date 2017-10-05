@@ -198,8 +198,7 @@
     <p>Compute climate statistics from spatial probability distributions.</p>
     
 
-    <pre class="usage"><span class='fu'>clim_stats_ar5</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"monthly"</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
-  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_stats</span>[<span class='fl'>1</span>], <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
+    <pre class="usage"><span class='fu'>clim_stats_ar5</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"monthly"</span>, <span class='no'>in_dir</span>, <span class='no'>out_dir</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -210,11 +209,11 @@
     </tr>
     <tr>
       <th>in_dir</th>
-      <td><p>input directory, e.g. <code>snapdef()$ar5dir_dist_monthly</code> or <code>snapdef()$ar5dir_dist_seasonal</code>.</p></td>
+      <td><p>input directory, e.g. <code>snapdef()$ar5dir_dist_monthly</code> or <code>snapdef()$ar5dir_dist_seasonal</code>. See details.</p></td>
     </tr>
     <tr>
       <th>out_dir</th>
-      <td><p>output directory, e.g. one of the <code>snapdef()$ar5dir_dist_stats</code> entries.</p></td>
+      <td><p>output directory, e.g. one of the <code>snapdef()$ar5dir_dist_stats</code> entries. See details.</p></td>
     </tr>
     <tr>
       <th>mc.cores</th>
@@ -225,10 +224,10 @@
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>For efficiency, this function operates on outputs from <code>clim_dist_monthly</code> and <code>clim_dist_seasonal</code>.
-It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.
-Note the defaults for <code>type</code>, <code>in_dir</code> and <code>out_dir</code>. They all work together and specify calculating statistics for monthly inputs.
-When changing these directories, make sure to always separately indicate the type as monthly or seasonal.
-It is not inferred from input or output directories, since these can have arbitrary names if not using default arguments.</p>
+It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.</p>
+<p>The example <code>in_dir</code> and <code>out_dir</code> shown are assumed if these arguments are missing.
+This is for convenience and they will adjust automatically based on <code>type</code>.
+If providing alternate directories, make sure to specify in accordance with your <code>type</code>.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
