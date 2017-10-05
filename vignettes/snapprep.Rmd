@@ -72,7 +72,7 @@ clim_dist_seasonal()
 
 It is recommended, however, to split the processing into multiple batches by using the `rcp` and `variable` arguments:
 
-```{r cmip5_seasonal, eval = FALSE}
+```{r cmip5_seasonal2, eval = FALSE}
 clim_dist_seasonal(rcp = "rcp60", variable = "tas")
 ```
 
