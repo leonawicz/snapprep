@@ -87,6 +87,9 @@
       <a href="https://leonawicz.github.io/snapfuns">snapfuns</a>
     </li>
     <li>
+      <a href="https://leonawicz.github.io/snaplocs">snaplocs</a>
+    </li>
+    <li>
       <a href="https://leonawicz.github.io/snapprep">snapprep</a>
     </li>
     <li>
@@ -192,11 +195,16 @@ x</code></pre></div>
 <h2 class="hasAnchor">
 <a href="#seasonal-and-annual-data" class="anchor"></a>Seasonal and annual data</h2>
 <p>Modeling seasonal and annual temporal resolution distributions does not require revisiting the source downscaled geotiff files. That brute force approach of aggregating the source data to seasonal and annual averages would be a waste of time and effort. The sensible approach is to estimate seasonal and annual distributions from the already estimated monthly distributions. Those outputs now become your inputs. The further you get from the source data as you continue down the processing pipeline, the faster the processing will go.</p>
-<p><code>clim_dist_seasonal</code> does not do parallel processing internally. You can wrap it in <code>mclapply</code>. This is expected. Its first argument is the iterator index. Annual is included as a “season” in the outputs from this function. There is a one-to-one correspondence between monthly and seasonal files. <code>files</code> is simply a list of all the files created by <code>clim_dist_monthly</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">in_dir &lt;-<span class="st"> </span><span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()$ar5dir_dist_monthly
-files_monthly &lt;-<span class="st"> </span><span class="kw">list.files</span>(in_dir, <span class="dt">pattern =</span> <span class="st">".rds$"</span>, <span class="dt">full.names =</span> <span class="ot">TRUE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)
-parallel::<span class="kw">mclapply</span>(<span class="kw">seq_along</span>(files), clim_dist_seasonal, <span class="dt">files =</span> files_monthly)</code></pre></div>
-<p>Like the monthly outputs, now you have seasonal (and annual) climate variable distributions. The next step is to produce statistics from these distributions, which are useful and efficient for projects requiring specific statistics and not the need for general distributional information. The following function can be applied to both monthly and seasonal outputs. It offers internal parallel processing, again defaulting to the full 32 CPUs available on an Atlas compute node.</p>
+<p><code>clim_dist_seasonal</code> also uses parallel processing internally. There is a one-to-one correspondence between monthly and seasonal files. Using default arguments, it is as simple as:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/clim_dist_seasonal.html">clim_dist_seasonal</a></span>()</code></pre></div>
+<p>It is recommended, however, to split the processing into multiple batches by using the <code>rcp</code> and <code>variable</code> arguments:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/clim_dist_seasonal.html">clim_dist_seasonal</a></span>(<span class="dt">rcp =</span> <span class="st">"rcp60"</span>, <span class="dt">variable =</span> <span class="st">"tas"</span>)</code></pre></div>
+<p>The options for <code>rcp</code> include <code>historical</code>, <code>rcp45</code>, <code>rcp60</code> and <code>rcp85</code>. The options for climate variable include <code>pr</code>, <code>tas</code>, <code>tasmin</code> and <code>tasmax</code>. Like the monthly outputs, now you have seasonal (and annual) climate variable distributions, stored (by default) in an adjacent directory with analogous structure.</p>
+</div>
+<div id="climate-statistics" class="section level2">
+<h2 class="hasAnchor">
+<a href="#climate-statistics" class="anchor"></a>Climate statistics</h2>
+<p>The next step is to produce statistics from these distributions, which are useful and efficient for projects requiring specific statistics and not the need for general distributional information. The following function can be applied to both monthly and seasonal outputs. It offers internal parallel processing, again defaulting to the full 32 CPUs available on an Atlas compute node.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">in_dir2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()$ar5dir_dist_seasonal
 files_seasonal &lt;-<span class="st"> </span><span class="kw">list.files</span>(in_dir, <span class="dt">pattern =</span> <span class="st">".rds$"</span>, <span class="dt">full.names =</span> <span class="ot">TRUE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)
 parallel::<span class="kw">mclapply</span>(<span class="kw">seq_along</span>(files), clim_dist_seasonal, <span class="dt">files =</span> files)
@@ -215,6 +223,7 @@ parallel::<span class="kw">mclapply</span>(<span class="kw">seq_along</span>(fil
 <li><a href="#climate-distributions">Climate distributions</a></li>
       <li><a href="#monthly-data">Monthly data</a></li>
       <li><a href="#seasonal-and-annual-data">Seasonal and annual data</a></li>
+      <li><a href="#climate-statistics">Climate statistics</a></li>
       </ul>
 </div>
       </div>

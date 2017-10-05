@@ -113,6 +113,9 @@
       <a href="https://leonawicz.github.io/snapfuns">snapfuns</a>
     </li>
     <li>
+      <a href="https://leonawicz.github.io/snaplocs">snaplocs</a>
+    </li>
+    <li>
       <a href="https://leonawicz.github.io/snapprep">snapprep</a>
     </li>
     <li>
@@ -195,19 +198,19 @@
     <p>Compute climate statistics from spatial probability distributions.</p>
     
 
-    <pre class="usage"><span class='fu'>clim_stats_ar5</span>(<span class='no'>files</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"monthly"</span>,
+    <pre class="usage"><span class='fu'>clim_stats_ar5</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"monthly"</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
   <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_stats</span>[<span class='fl'>1</span>], <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>files</th>
-      <td><p>input files.</p></td>
-    </tr>
-    <tr>
       <th>type</th>
       <td><p>character, <code>"monthly"</code> or <code>"seasonal"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>in_dir</th>
+      <td><p>input directory, e.g. <code>snapdef()$ar5dir_dist_monthly</code> or <code>snapdef()$ar5dir_dist_seasonal</code>.</p></td>
     </tr>
     <tr>
       <th>out_dir</th>
@@ -215,23 +218,23 @@
     </tr>
     <tr>
       <th>mc.cores</th>
-      <td><p>number of processors.</p></td>
+      <td><p>number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.</p></td>
     </tr>
     </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>invisible, writes files.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>For efficiency, this function operates on outputs from <code>clim_dist_monthly</code> and <code>clim_dist_seasonal</code>.
-It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.</p>
+It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.
+Note the defaults for <code>type</code>, <code>in_dir</code> and <code>out_dir</code>. They all work together and specify calculating statistics for monthly inputs.
+When changing these directories, make sure to always separately indicate the type as monthly or seasonal.
+It is not inferred from input or output directories, since these can have arbitrary names if not using default arguments.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>clim_stats_ar5</span>(<span class='no'>files</span>)
+<span class='fu'>clim_stats_ar5</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"monthly"</span>)
+<span class='fu'>clim_stats_ar5</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"seasonal"</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -239,8 +242,6 @@ It does not need to redundantly access source downscaled geotiffs. This function
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>

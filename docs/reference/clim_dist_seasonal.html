@@ -113,6 +113,9 @@
       <a href="https://leonawicz.github.io/snapfuns">snapfuns</a>
     </li>
     <li>
+      <a href="https://leonawicz.github.io/snaplocs">snaplocs</a>
+    </li>
+    <li>
       <a href="https://leonawicz.github.io/snapprep">snapprep</a>
     </li>
     <li>
@@ -195,51 +198,55 @@
     <p>Compute seasonal climate data spatial probability distributions.</p>
     
 
-    <pre class="usage"><span class='fu'>clim_dist_seasonal</span>(<span class='no'>i</span>, <span class='no'>files</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
+    <pre class="usage"><span class='fu'>clim_dist_seasonal</span>(<span class='no'>variable</span>, <span class='no'>rcp</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
   <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_seasonal</span>, <span class='kw'>density.args</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-  <span class='kw'>adjust</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))</pre>
+  <span class='kw'>adjust</span> <span class='kw'>=</span> <span class='fl'>0.1</span>), <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>i</th>
-      <td><p>iterator for files.</p></td>
+      <th>variable</th>
+      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
     </tr>
     <tr>
-      <th>files</th>
-      <td><p>vector of input files.</p></td>
+      <th>rcp</th>
+      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
     </tr>
     <tr>
       <th>in_dir</th>
-      <td><p>input directory.</p></td>
+      <td><p>input directory, e.g., <code>snapdef()$ar5dir_dist_monthly</code>.</p></td>
     </tr>
     <tr>
       <th>out_dir</th>
-      <td><p>output directory.</p></td>
+      <td><p>output directory, e.g., <code>snapdef()$ar5dir_dist_seasonal</code></p></td>
     </tr>
     <tr>
       <th>density.args</th>
       <td><p>arguments list passed to <code>density</code>.</p></td>
     </tr>
+    <tr>
+      <th>mc.cores</th>
+      <td><p>number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.</p></td>
+    </tr>
     </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>invisible, writes files.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Seasons are DJF, MAM, JJA and SON 3-month averages. A fifth "season" of full annual averages is also included.
 For efficiency, this function operates on outputs from <code>clim_dist_monthly</code>. It does not need to redundantly
 access source downscaled geotiffs.</p>
+<p>Use <code>variable</code> to optionally specify a climate variable file identifier: <code>"pr"</code>, <code>"tas"</code>, <code>"tasmin"</code> or <code>"tasmax"</code>.
+This will be used for pattern matching when listing files inside <code>in_dir</code>.
+Similarly, use <code>rcp</code> to process a smaller batch.
+These are helpful when there are many files, such that there could be RAM or time limitations.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>mclapply</span>(<span class='fu'>seq_along</span>(<span class='no'>files</span>), <span class='no'>clim_dist_seasonal</span>,
- <span class='kw'>files</span> <span class='kw'>=</span> <span class='no'>files</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)
-
+<span class='fu'>clim_dist_seasonal</span>() <span class='co'># all variables</span>
+<span class='fu'>clim_dist_seasonal</span>(<span class='kw'>variable</span> <span class='kw'>=</span> <span class='st'>"pr"</span>) <span class='co'># precipitation</span>
+<span class='fu'>clim_dist_seasonal</span>(<span class='kw'>variable</span> <span class='kw'>=</span> <span class='st'>"pr"</span>, <span class='kw'>rcp</span> <span class='kw'>=</span> <span class='st'>"rcp60"</span>) <span class='co'># precipitation and RCP 6.0</span>
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -247,8 +254,6 @@ access source downscaled geotiffs.</p>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
