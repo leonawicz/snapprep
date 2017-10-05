@@ -210,13 +210,14 @@ clim_dist_seasonal <- function(variable, rcp, in_dir = snapdef()$ar5dir_dist_mon
 #'
 #' For efficiency, this function operates on outputs from \code{clim_dist_monthly} and \code{clim_dist_seasonal}.
 #' It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.
-#' Note the defaults for \code{type}, \code{in_dir} and \code{out_dir}. They all work together and specify calculating statistics for monthly inputs.
-#' When changing these directories, make sure to always separately indicate the type as monthly or seasonal.
-#' It is not inferred from input or output directories, since these can have arbitrary names if not using default arguments.
+#'
+#' The example \code{in_dir} and \code{out_dir} shown are assumed if these arguments are missing.
+#' This is for convenience and they will adjust automatically based on \code{type}.
+#' If providing alternate directories, make sure to specify in accordance with your \code{type}.
 #'
 #' @param type character, \code{"monthly"} or \code{"seasonal"}.
-#' @param in_dir input directory, e.g. \code{snapdef()$ar5dir_dist_monthly} or \code{snapdef()$ar5dir_dist_seasonal}.
-#' @param out_dir output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries.
+#' @param in_dir input directory, e.g. \code{snapdef()$ar5dir_dist_monthly} or \code{snapdef()$ar5dir_dist_seasonal}. See details.
+#' @param out_dir output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries. See details.
 #' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @export
@@ -226,13 +227,19 @@ clim_dist_seasonal <- function(variable, rcp, in_dir = snapdef()$ar5dir_dist_mon
 #' clim_stats_ar5(type = "monthly")
 #' clim_stats_ar5(type = "seasonal")
 #' }
-clim_stats_ar5 <- function(type = "monthly", in_dir = snapdef()$ar5dir_dist_monthly,
-                           out_dir = snapdef()$ar5dir_dist_stats[1], mc.cores = 32){
+clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
   if(!type %in% c("monthly", "seasonal")) stop("`type` must be 'monthly' or 'seasonal'.")
+  if(missing(in_dir)){
+    if(type == "monthly") in_dir <- snapdef()$ar5dir_dist_monthly
+    if(type == "seasonal") in_dir <- snapdef()$ar5dir_dist_seasonal
+  }
+  if(missing(out_dir)){
+    if(type == "monthly") out_dir <- snapdef()$ar5dir_dist_stats[1]
+    if(type == "seasonal") out_dir <- snapdef()$ar5dir_dist_stats[2]
+  }
   files <- list.files(in_dir, pattern = ".rds$", recursive = TRUE)
-  grpDir <- dirname(files[1])
-  loc <- basename(grpDir)
-  dir.create(out_dir <- file.path(out_dir, grpDir), showWarnings = FALSE, recursive = TRUE)
+  grp <- basename(dirname(dirname(files)))
+  loc <- basename(dirname(files))
   rcp_levels <- c("Historical", "4.5", "6.0", "8.5")
   relabel_rcps <- function(x) sapply(
     x, function(x) switch(x, historical = "Historical", rcp45 = "4.5", rcp60 = "6.0", rcp85 = "8.5"))
@@ -242,47 +249,70 @@ clim_stats_ar5 <- function(type = "monthly", in_dir = snapdef()$ar5dir_dist_mont
     x, function(x) switch(x, annual = "Annual", winter = "Winter", spring = "Spring",
                           summer = "Summer", autumn = "Autumn"))
   f <- if(type == "seasonal") relabel_seasons else function(x) x
-  files <- cbind(files, loc, do.call(rbind, strsplit(basename(files), "_"))) %>%
-    tibble::data_frame() %>% dplyr::mutate(V6 = gsub("\\.rds", "", .data[["V6"]]))
-  names(files) <- c("files", "Region", "Var", "RCP", "GCM", "Season")
+  files <- cbind(files, grp, loc, do.call(rbind, strsplit(basename(files), "_"))) %>%
+    tibble::as_data_frame()
+  nam <- c("files", "Group", "Region", "Var", "RCP", "GCM")
+  if(type == "seasonal") nam <- c(nam, "Season")
+  names(files) <- nam
+  if(type == "monthly") files <- dplyr::mutate(files, GCM = gsub("\\.rds", "", .data[["GCM"]]))
+  if(type == "seasonal") files <- dplyr::mutate(files, Season = gsub("\\.rds", "", .data[["Season"]]))
   files <- dplyr::mutate(
     files,
-    Region = factor(.data[["Region"]], levels = sort(unique(loc))),
-    Var = factor(.data[["Var"]], levels = c("pr", "tas", "tasmin", "tasmax")),
     RCP = factor(relabel_rcps(.data[["RCP"]]), levels = rcp_levels),
-    GCM = factor(factor(ifelse(.data[["GCM"]] == "ts40", "CRU 4.0", .data[["GCM"]]), levels = model_levels)),
-    Season = factor(f(.data[["Season"]]), levels = season_levels))
-  .stats <- function(i, files){
-    cat(paste("File", i, "of", nrow(files), "...\n"))
-    readRDS(files$files[i]) %>% rvtable::rvtable %>% rvtable::sample_rvtable %>%
-      dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]]) %>%
-      dplyr::summarise(
-        Mean = round(mean(.data[["Val"]]), 1),
-        SD = round(stats::sd(.data[["Val"]]), 1),
-        Min = round(min(.data[["Val"]]), 1),
-        Pct_05 = round(stats::quantile(.data[["Val"]], 0.05), 1),
-        Pct_10 = round(stats::quantile(.data[["Val"]], 0.10), 1),
-        Pct_25 = round(stats::quantile(.data[["Val"]], 0.25), 1),
-        Pct_50 = round(stats::quantile(.data[["Val"]], 0.50), 1),
-        Pct_75 = round(stats::quantile(.data[["Val"]], 0.75), 1),
-        Pct_90 = round(stats::quantile(.data[["Val"]], 0.90), 1),
-        Pct_95 = round(stats::quantile(.data[["Val"]], 0.95), 1),
-        Max = round(max(.data[["Val"]]), 1)) %>%
-      dplyr::ungroup() %>% dplyr::mutate(
-        Region = files$Region[i], Var = files$Var[i], RCP = files$RCP[i], GCM = files$GCM[i],
-        Season = files$Season[i])
+    GCM = factor(factor(ifelse(.data[["GCM"]] == "ts40", "CRU 4.0", .data[["GCM"]]),
+                        levels = model_levels)),
+    Var = factor(.data[["Var"]], levels = c("pr", "tas", "tasmin", "tasmax")),
+    Group = factor(.data[["Group"]], levels = sort(unique(grp))),
+    Region = factor(.data[["Region"]], levels = sort(unique(loc)))
+  )
+  if(type == "seasonal"){
+    files <- dplyr::mutate(files, Season = factor(f(.data[["Season"]]), levels = season_levels))
   }
-  files <- split(files, loc)
+  .stats <- function(i, files, in_dir, type){
+    cat(paste("File", i, "of", nrow(files), "...\n"))
+    file <- file.path(in_dir, files$files[i])
+    x0 <- dplyr::slice(files, i) %>% dplyr::select(-.data[["files"]])
+    x <- readRDS(file) %>% rvtable::sample_rvtable() %>% dplyr::ungroup()
+    if(type == "monthly"){
+      x <- dplyr::group_by(x, .data[["Year"]], .data[["Month"]])
+    } else {
+      x <- dplyr::group_by(x, .data[["Year"]])
+    }
+    x <- dplyr::summarise(x,
+      Mean = round(mean(.data[["Val"]]), 1),
+      SD = round(stats::sd(.data[["Val"]]), 1),
+      Min = round(min(.data[["Val"]]), 1),
+      Pct_05 = round(stats::quantile(.data[["Val"]], 0.05), 1),
+      Pct_10 = round(stats::quantile(.data[["Val"]], 0.10), 1),
+      Pct_25 = round(stats::quantile(.data[["Val"]], 0.25), 1),
+      Pct_50 = round(stats::quantile(.data[["Val"]], 0.50), 1),
+      Pct_75 = round(stats::quantile(.data[["Val"]], 0.75), 1),
+      Pct_90 = round(stats::quantile(.data[["Val"]], 0.90), 1),
+      Pct_95 = round(stats::quantile(.data[["Val"]], 0.95), 1),
+      Max = round(max(.data[["Val"]]), 1)) %>%
+    dplyr::ungroup() %>% dplyr::mutate(
+      RCP = x0$RCP, GCM = x0$GCM, Var = x0$Var, Group = x0$Group, Region = x0$Region)
+    if(type == "monthly") x <- dplyr::mutate(
+      x, Month = factor(month.abb[.data[["Month"]]], levels = month.abb))
+    if(type == "seasonal") x <- dplyr::mutate(x, Season = x0$Season)
+    x
+  }
+  files <- split(files, paste(grp, loc, sep = "_"))
   for(j in seq_along(files)){
-    x <- parallel::mclapply(seq_along(files[[j]]), .stats, files = files[[j]], mc.cores = mc.cores)
-    x <- dplyr::bind_rows(x) %>% dplyr::select(
-      .data[["RCP"]], .data[["GCM"]], .data[["Region"]], .data[["Var"]], .data[["Year"]], .data[["Season"]],
-      .data[["Mean"]], .data[["SD"]], .data[["Min"]], .data[["Pct_05"]], .data[["Pct_10"]], .data[["Pct_25"]],
-      .data[["Pct_50"]], .data[["Pct_75"]], .data[["Pct_90"]], .data[["Pct_95"]], .data[["Max"]]) %>%
-      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Region"]],
-                     .data[["Var"]], .data[["Year"]], .data[["Season"]])
-    if(type == "monthly") x <- dplyr::rename(x, Month = .data[["Season"]]) # nolint
-    outfile <- file.path(out_dir, unique(as.character(files[[j]]$Region)), "_climate.rds")
+    x <- parallel::mclapply(1:nrow(files[[j]]), .stats,
+                            files = files[[j]], in_dir = in_dir, type = type, mc.cores = mc.cores)
+    x <- dplyr::bind_rows(x)
+    if(type == "monthly")
+      x <- dplyr::select(x, c(14:18, 1:13)) %>%
+      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Region"]],
+                     .data[["Year"]], .data[["Month"]])
+    if(type == "seasonal")
+      x <- dplyr::select(x, c(13:17, 1, 18, 2:12)) %>%
+      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Region"]],
+                     .data[["Year"]], .data[["Season"]])
+    grp_loc <- strsplit(names(files)[j], "_")[[1]]
+    dir.create(out_dir_tmp <- file.path(out_dir, grp_loc[1]), showWarnings = FALSE, recursive = TRUE)
+    outfile <- paste0(out_dir_tmp, "/", grp_loc[2], "_clim_stats.rds")
     saveRDS(x, outfile)
   }
   invisible()
