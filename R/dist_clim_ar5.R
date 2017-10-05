@@ -136,9 +136,10 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #' For efficiency, this function operates on outputs from \code{clim_dist_monthly}. It does not need to redundantly
 #' access source downscaled geotiffs.
 #'
+#' \code{files} typically come from \code{snapdef()$ar5dir_dist_monthly}. See example for how to list files.
+#'
 #' @param i iterator for files.
-#' @param files vector of input files.
-#' @param in_dir input directory.
+#' @param files vector of input files. See details.
 #' @param out_dir output directory.
 #' @param density.args arguments list passed to \code{density}.
 #'
@@ -147,11 +148,11 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #'
 #' @examples
 #' \dontrun{
-#' mclapply(seq_along(files), clim_dist_seasonal,
-#'  files = files, mc.cores = 32)
+#' in_dir <- snapdef()$ar5dir_dist_monthly
+#' files <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
+#' parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files, mc.cores = 32)
 #'  }
-clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
-                               out_dir = snapdef()$ar5dir_dist_seasonal,
+clim_dist_seasonal <- function(i, files, out_dir = snapdef()$ar5dir_dist_seasonal,
                                density.args = list(n = 200, adjust = 0.1)){
   .seasonal <- function(x, season, density.args){
     .season <- function(x, months){
@@ -174,7 +175,9 @@ clim_dist_seasonal <- function(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
     rvtable::marginalize(x, "Month", density.args = density.args)
   }
   file <- files[i]
-  dir.create(out_dir <- file.path(out_dir, dirname(file)), showWarnings = FALSE, recursive = TRUE)
+  path <- strsplit(file, "/")[[1]]
+  path <- paste0(path[(length(path) - 2):(length(path) - 1)], collapse = "/")
+  dir.create(out_dir <- file.path(out_dir, path), showWarnings = FALSE, recursive = TRUE)
   outfile <- file.path(out_dir, strsplit(basename(file), "\\.")[[1]][1])
   x <- readRDS(file)
   y <- .seasonal(x, "annual", density.args=density.args)
