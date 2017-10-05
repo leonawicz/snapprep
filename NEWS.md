@@ -1,9 +1,10 @@
-# snapprep 0.1.1
+# snapprep 0.1.9 (Release date: 2017-10-05)
 
 * Fixed issue with output directory paths for seasonal climate distributions.
 * Updated example code.
 * Removed unneeded, unused function argument from `clim_dist_seasonal`. The function only takes `files` for input. Use absolute paths.
 * Added `vairable` and `rcp` arguments to `clim_dist_seasonal` for splitting processing into smaller file batches.
+* Refactored `clim_stats_ar5`. This function uses monthly or seasonal outputs from `clim_dist_monthly` and `clim_dist_seasonal` to compute statistics.
 
 # snapprep 0.1.0
 
