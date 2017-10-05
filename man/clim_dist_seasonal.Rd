@@ -4,16 +4,13 @@
 \alias{clim_dist_seasonal}
 \title{Compute seasonal climate data spatial distributions}
 \usage{
-clim_dist_seasonal(i, files, in_dir = snapdef()$ar5dir_dist_monthly,
-  out_dir = snapdef()$ar5dir_dist_seasonal, density.args = list(n = 200,
-  adjust = 0.1))
+clim_dist_seasonal(i, files, out_dir = snapdef()$ar5dir_dist_seasonal,
+  density.args = list(n = 200, adjust = 0.1))
 }
 \arguments{
 \item{i}{iterator for files.}
 
-\item{files}{vector of input files.}
-
-\item{in_dir}{input directory.}
+\item{files}{vector of input files. See details.}
 
 \item{out_dir}{output directory.}
 
@@ -29,10 +26,13 @@ Compute seasonal climate data spatial probability distributions.
 Seasons are DJF, MAM, JJA and SON 3-month averages. A fifth "season" of full annual averages is also included.
 For efficiency, this function operates on outputs from \code{clim_dist_monthly}. It does not need to redundantly
 access source downscaled geotiffs.
+
+\code{files} typically come from \code{snapdef()$ar5dir_dist_monthly}. See example for how to list files.
 }
 \examples{
 \dontrun{
-mclapply(seq_along(files), clim_dist_seasonal,
- files = files, mc.cores = 32)
+in_dir <- snapdef()$ar5dir_dist_monthly
+files <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
+parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files, mc.cores = 32)
  }
 }
