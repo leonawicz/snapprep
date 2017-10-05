@@ -4,20 +4,20 @@
 \alias{clim_dist_seasonal}
 \title{Compute seasonal climate data spatial distributions}
 \usage{
-clim_dist_seasonal(i, files, out_dir = snapdef()$ar5dir_dist_seasonal,
-  density.args = list(n = 200, adjust = 0.1))
+clim_dist_seasonal(variable, in_dir = snapdef()$ar5dir_dist_monthly,
+  out_dir = snapdef()$ar5dir_dist_seasonal, density.args = list(n = 200,
+  adjust = 0.1), mc.cores = 32)
 }
 \arguments{
-\item{i}{iterator for files.}
+\item{variable}{character, optional, to split into smaller file batches. See details.}
 
-\item{files}{vector of input files. See details.}
+\item{in_dir}{input directory, e.g., \code{snapdef()$ar5dir_dist_monthly}.}
 
-\item{out_dir}{output directory.}
+\item{out_dir}{output directory, e.g., \code{snapdef()$ar5dir_dist_seasonal}}
 
 \item{density.args}{arguments list passed to \code{density}.}
-}
-\value{
-invisible, writes files.
+
+\item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \description{
 Compute seasonal climate data spatial probability distributions.
@@ -27,12 +27,12 @@ Seasons are DJF, MAM, JJA and SON 3-month averages. A fifth "season" of full ann
 For efficiency, this function operates on outputs from \code{clim_dist_monthly}. It does not need to redundantly
 access source downscaled geotiffs.
 
-\code{files} typically come from \code{snapdef()$ar5dir_dist_monthly}. See example for how to list files.
+Use \code{variable} to optionally specify a climate variable file identifier: \code{"pr"}, \code{"tas"}, \code{"tasmin"} or \code{"tasmax"}.
+This will be used for pattern matching when listing files inside \code{in_dir}.
 }
 \examples{
 \dontrun{
-in_dir <- snapdef()$ar5dir_dist_monthly
-files <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
-parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files, mc.cores = 32)
- }
+clim_dist_seasonal() # all variables
+clim_dist_seasonal(variable = "pr") # precipitation
+}
 }

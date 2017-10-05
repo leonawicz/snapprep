@@ -4,20 +4,17 @@
 \alias{clim_stats_ar5}
 \title{Compute climate statistics}
 \usage{
-clim_stats_ar5(files, type = "monthly",
+clim_stats_ar5(type = "monthly", in_dir = snapdef()$ar5dir_dist_monthly,
   out_dir = snapdef()$ar5dir_dist_stats[1], mc.cores = 32)
 }
 \arguments{
-\item{files}{input files.}
-
 \item{type}{character, \code{"monthly"} or \code{"seasonal"}.}
+
+\item{in_dir}{input directory, e.g. \code{snapdef()$ar5dir_dist_monthly} or \code{snapdef()$ar5dir_dist_seasonal}.}
 
 \item{out_dir}{output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries.}
 
-\item{mc.cores}{number of processors.}
-}
-\value{
-invisible, writes files.
+\item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \description{
 Compute climate statistics from spatial probability distributions.
@@ -25,7 +22,13 @@ Compute climate statistics from spatial probability distributions.
 \details{
 For efficiency, this function operates on outputs from \code{clim_dist_monthly} and \code{clim_dist_seasonal}.
 It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.
+Note the defaults for \code{type}, \code{in_dir} and \code{out_dir}. They all work together and specify calculating statistics for monthly inputs.
+When changing these directories, make sure to always separately indicate the type as monthly or seasonal.
+It is not inferred from input or output directories, since these can have arbitrary names if not using default arguments.
 }
 \examples{
-\dontrun{clim_stats_ar5(files)}
+\dontrun{
+clim_stats_ar5(type = "monthly")
+clim_stats_ar5(type = "seasonal")
+}
 }
