@@ -136,24 +136,28 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #' For efficiency, this function operates on outputs from \code{clim_dist_monthly}. It does not need to redundantly
 #' access source downscaled geotiffs.
 #'
-#' \code{files} typically come from \code{snapdef()$ar5dir_dist_monthly}. See example for how to list files.
+#' Use \code{variable} to optionally specify a climate variable file identifier: \code{"pr"}, \code{"tas"}, \code{"tasmin"} or \code{"tasmax"}.
+#' This will be used for pattern matching when listing files inside \code{in_dir}.
 #'
-#' @param i iterator for files.
-#' @param files vector of input files. See details.
-#' @param out_dir output directory.
+#' @param variable character, optional, to split into smaller file batches. See details.
+#' @param in_dir input directory, e.g., \code{snapdef()$ar5dir_dist_monthly}.
+#' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_dist_seasonal}
 #' @param density.args arguments list passed to \code{density}.
+#' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
-#' @return invisible, writes files.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' in_dir <- snapdef()$ar5dir_dist_monthly
-#' files <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
-#' parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files, mc.cores = 32)
-#'  }
-clim_dist_seasonal <- function(i, files, out_dir = snapdef()$ar5dir_dist_seasonal,
-                               density.args = list(n = 200, adjust = 0.1)){
+#' clim_dist_seasonal() # all variables
+#' clim_dist_seasonal(variable = "pr") # precipitation
+#' }
+clim_dist_seasonal <- function(variable, in_dir = snapdef()$ar5dir_dist_monthly,
+                               out_dir = snapdef()$ar5dir_dist_seasonal,
+                               density.args = list(n = 200, adjust = 0.1), mc.cores = 32){
+  pat <- if(missing(variable)) ".rds$" else paste0("^", variable, ".*.rds$")
+  files <- list.files(in_dir, pattern = pat, recursive = TRUE)
+
   .seasonal <- function(x, season, density.args){
     .season <- function(x, months){
       yrs <- range(x$Year)
@@ -174,22 +178,26 @@ clim_dist_seasonal <- function(i, files, out_dir = snapdef()$ar5dir_dist_seasona
                 "autumn" = .season(x, 9:11))
     rvtable::marginalize(x, "Month", density.args = density.args)
   }
-  file <- files[i]
-  path <- strsplit(file, "/")[[1]]
-  path <- paste0(path[(length(path) - 2):(length(path) - 1)], collapse = "/")
-  dir.create(out_dir <- file.path(out_dir, path), showWarnings = FALSE, recursive = TRUE)
-  outfile <- file.path(out_dir, strsplit(basename(file), "\\.")[[1]][1])
-  x <- readRDS(file)
-  y <- .seasonal(x, "annual", density.args=density.args)
-  saveRDS(y, paste0(outfile, "_annual.rds"))
-  y <- .seasonal(x, "winter", density.args=density.args)
-  saveRDS(y, paste0(outfile, "_winter.rds"))
-  y <- .seasonal(x, "spring", density.args=density.args)
-  saveRDS(y, paste0(outfile, "_spring.rds"))
-  y <- .seasonal(x, "summer", density.args=density.args)
-  saveRDS(y, paste0(outfile, "_summer.rds"))
-  y <- .seasonal(x, "autumn", density.args=density.args)
-  saveRDS(y, paste0(outfile, "_autumn.rds"))
+
+  compute_and_save <- function(file, out_dir){
+    path <- strsplit(file, "/")[[1]]
+    path <- paste0(path[(length(path) - 2):(length(path) - 1)], collapse = "/")
+    dir.create(out_dir <- file.path(out_dir, path), showWarnings = FALSE, recursive = TRUE)
+    outfile <- file.path(out_dir, strsplit(basename(file), "\\.")[[1]][1])
+    x <- readRDS(file)
+    y <- .seasonal(x, "annual", density.args=density.args)
+    saveRDS(y, paste0(outfile, "_annual.rds"))
+    y <- .seasonal(x, "winter", density.args=density.args)
+    saveRDS(y, paste0(outfile, "_winter.rds"))
+    y <- .seasonal(x, "spring", density.args=density.args)
+    saveRDS(y, paste0(outfile, "_spring.rds"))
+    y <- .seasonal(x, "summer", density.args=density.args)
+    saveRDS(y, paste0(outfile, "_summer.rds"))
+    y <- .seasonal(x, "autumn", density.args=density.args)
+    saveRDS(y, paste0(outfile, "_autumn.rds"))
+    invisible()
+  }
+  parallel::mclapply(files, par_fun, out_dir = out_dir, mc.cores = mc.cores)
   invisible()
 }
 
@@ -199,19 +207,26 @@ clim_dist_seasonal <- function(i, files, out_dir = snapdef()$ar5dir_dist_seasona
 #'
 #' For efficiency, this function operates on outputs from \code{clim_dist_monthly} and \code{clim_dist_seasonal}.
 #' It does not need to redundantly access source downscaled geotiffs. This function is specific to AR5 outputs in the current implementation.
+#' Note the defaults for \code{type}, \code{in_dir} and \code{out_dir}. They all work together and specify calculating statistics for monthly inputs.
+#' When changing these directories, make sure to always separately indicate the type as monthly or seasonal.
+#' It is not inferred from input or output directories, since these can have arbitrary names if not using default arguments.
 #'
-#' @param files input files.
 #' @param type character, \code{"monthly"} or \code{"seasonal"}.
+#' @param in_dir input directory, e.g. \code{snapdef()$ar5dir_dist_monthly} or \code{snapdef()$ar5dir_dist_seasonal}.
 #' @param out_dir output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries.
-#' @param mc.cores number of processors.
+#' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
-#' @return invisible, writes files.
 #' @export
 #'
 #' @examples
-#' \dontrun{clim_stats_ar5(files)}
-clim_stats_ar5 <- function(files, type = "monthly", out_dir = snapdef()$ar5dir_dist_stats[1], mc.cores = 32){
+#' \dontrun{
+#' clim_stats_ar5(type = "monthly")
+#' clim_stats_ar5(type = "seasonal")
+#' }
+clim_stats_ar5 <- function(type = "monthly", in_dir = snapdef()$ar5dir_dist_monthly,
+                           out_dir = snapdef()$ar5dir_dist_stats[1], mc.cores = 32){
   if(!type %in% c("monthly", "seasonal")) stop("`type` must be 'monthly' or 'seasonal'.")
+  files <- list.files(in_dir, pattern = ".rds$", recursive = TRUE)
   grpDir <- dirname(files[1])
   loc <- basename(grpDir)
   dir.create(out_dir <- file.path(out_dir, grpDir), showWarnings = FALSE, recursive = TRUE)
