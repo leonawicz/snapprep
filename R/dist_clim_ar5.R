@@ -197,7 +197,7 @@ clim_dist_seasonal <- function(variable, in_dir = snapdef()$ar5dir_dist_monthly,
     saveRDS(y, paste0(outfile, "_autumn.rds"))
     invisible()
   }
-  parallel::mclapply(files, par_fun, out_dir = out_dir, mc.cores = mc.cores)
+  parallel::mclapply(files, compute_and_save, out_dir = out_dir, mc.cores = mc.cores)
   invisible()
 }
 
