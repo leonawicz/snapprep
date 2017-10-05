@@ -87,11 +87,8 @@ The following function can be applied to both monthly and seasonal outputs.
 It offers internal parallel processing, again defaulting to the full 32 CPUs available on an Atlas compute node.
 
 ```{r cmip5_stats, eval = FALSE}
-in_dir2 <- snapdef()$ar5dir_dist_seasonal
-files_seasonal <- list.files(in_dir, pattern = ".rds$", full.names = TRUE, recursive = TRUE)
-parallel::mclapply(seq_along(files), clim_dist_seasonal, files = files)
-clim_stats_ar5(files_monthly, type = "monthly")
-clim_stats_ar5(files_seasonal, type = "seasonal")
+clim_stats_ar5(type = "monthly")
+clim_stats_ar5(type = "seasonal")
 ```
 
 Make sure to read the documentation on these functions. You should be familiar with their arguments, including any not shown in this vignette.
