@@ -179,12 +179,10 @@ clim_dist_seasonal <- function(variable, in_dir = snapdef()$ar5dir_dist_monthly,
     rvtable::marginalize(x, "Month", density.args = density.args)
   }
 
-  compute_and_save <- function(file, out_dir){
-    path <- strsplit(file, "/")[[1]]
-    path <- paste0(path[(length(path) - 2):(length(path) - 1)], collapse = "/")
-    dir.create(out_dir <- file.path(out_dir, path), showWarnings = FALSE, recursive = TRUE)
+  compute_and_save <- function(file, in_dir, out_dir){
+    dir.create(out_dir <- file.path(out_dir, dirname(file)), showWarnings = FALSE, recursive = TRUE)
     outfile <- file.path(out_dir, strsplit(basename(file), "\\.")[[1]][1])
-    x <- readRDS(file)
+    x <- readRDS(file.path(in_dir, file))
     y <- .seasonal(x, "annual", density.args=density.args)
     saveRDS(y, paste0(outfile, "_annual.rds"))
     y <- .seasonal(x, "winter", density.args=density.args)
@@ -197,7 +195,7 @@ clim_dist_seasonal <- function(variable, in_dir = snapdef()$ar5dir_dist_monthly,
     saveRDS(y, paste0(outfile, "_autumn.rds"))
     invisible()
   }
-  parallel::mclapply(files, compute_and_save, out_dir = out_dir, mc.cores = mc.cores)
+  parallel::mclapply(files, compute_and_save, in_dir = in_dir, out_dir = out_dir, mc.cores = mc.cores)
   invisible()
 }
 
