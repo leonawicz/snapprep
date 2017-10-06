@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prepare And Curate Useful Data Sets From Raw SNAP Data • snapprep</title>
+<title>Uploading SNAP dat to AWS • snapprep</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-<!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../jquery.sticky-kit.min.js"></script><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -34,21 +34,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">snapprep</a>
+      <a class="navbar-brand" href="../index.html">snapprep</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="/index.html">
+  <a href="..//index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="articles/snapprep.html">Get Started</a>
+  <a href="../articles/snapprep.html">Get Started</a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -58,12 +58,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/aws.html">Uploading SNAP dat to AWS</a>
+      <a href="../articles/aws.html">Uploading SNAP dat to AWS</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">News</a>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -80,8 +80,7 @@
       <a href="https://leonawicz.github.io/sv.html">Home of the verse</a>
     </li>
     <li class="divider">
-    </li>
-<li class="dropdown-header">Sector packages</li>
+    <li class="dropdown-header">Sector packages</li>
     <li>
       <a href="https://leonawicz.github.io/snapverse">snapverse</a>
     </li>
@@ -95,8 +94,7 @@
       <a href="https://leonawicz.github.io/snapwebs">snapwebs</a>
     </li>
     <li class="divider">
-    </li>
-<li class="dropdown-header">Functions packages</li>
+    <li class="dropdown-header">Functions packages</li>
     <li>
       <a href="https://leonawicz.github.io/snapfuns">snapfuns</a>
     </li>
@@ -110,8 +108,7 @@
       <a href="https://leonawicz.github.io/alfresco">alfresco</a>
     </li>
     <li class="divider">
-    </li>
-<li class="dropdown-header">Data packages</li>
+    <li class="dropdown-header">Data packages</li>
     <li>
       <a href="https://leonawicz.github.io/snapclim">snapclim</a>
     </li>
@@ -128,8 +125,7 @@
       <a href="https://leonawicz.github.io/snapdist">snapdist</a>
     </li>
     <li class="divider">
-    </li>
-<li class="dropdown-header">Apps &amp; docs packages</li>
+    <li class="dropdown-header">Apps &amp; docs packages</li>
     <li>
       <a href="https://leonawicz.github.io/snapapps">snapapps</a>
     </li>
@@ -143,8 +139,7 @@
       <a href="https://leonawicz.github.io/snapdocs">snapdocs</a>
     </li>
     <li class="divider">
-    </li>
-<li class="dropdown-header">Satellite packages</li>
+    <li class="dropdown-header">Satellite packages</li>
     <li>
       <a href="https://leonawicz.github.io/rvtable">rvtable</a>
     </li>
@@ -182,62 +177,51 @@
       
       </header><div class="row">
   <div class="col-md-9">
-    
+    <div class="page-header toc-ignore">
+      <h1>Uploading SNAP dat to AWS</h1>
+            
+          </div>
 
     
     
 <div class="contents">
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-<div id="snapprep" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#snapprep" class="anchor"></a>snapprep</h1></div>
-
-<p>The <code>snapprep</code> package contains R functions used to support a wide range of SNAP projects by preparing and curating useful data sets from upstream raw SNAP data. The data sets compiled with the aid of <code>snapprep</code> are then made avaible to other projects. This includes compiling data sets that are contained in SNAPverse data packages.</p>
-<p><code>snapprep</code> is a developer package used by the SNAPverse author and maintainer. For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages, see the <code>snapfuns</code> package instead.</p>
-<div id="use-case-examples" class="section level2">
+<p>The <code>snapprep</code> R package makes it easy to upload curated data sets to Amazon Web Services for use by Shiny apps and other projects. This is done with <code>aws_upload</code>. It uploads data to an S3 bucket specified by <code>bkt</code>. The other arguments are <code>in_dir</code> for an input directory containing (recursively) all files to be uploaded and <code>prefix</code>, an optional string to place before each file name describing, for example, the desired pseudo-directory structure for the files placed in the bucket. Since this is a SNAP developer package rather than a user package, the default bucket is set to the author’s default bucket. See the example below.</p>
+<div id="data-for-snap-climate-analytics" class="section level2">
 <h2 class="hasAnchor">
-<a href="#use-case-examples" class="anchor"></a>Use case examples</h2>
-<p>Examples of some of the processing chains that <code>snapprep</code> is involved in include:</p>
-<ul>
-<li>Preparing climate distributions data frames for the <code>climdist</code> Shiny app.</li>
-<li>Compiling data frames of cell indices of the intersection of commonly used SNAP polygon shapefiles with common rasterized map layers for subsequent efficient processing of large data extraction tasks.</li>
-<li>Uploading curated data sets to Amazon Web Services S3 buckets for rapid access remote use by various SNAP applications and projects.</li>
-</ul>
+<a href="#data-for-snap-climate-analytics" class="anchor"></a>Data for SNAP Climate Analytics</h2>
+<p>The SNAP <a href="https://uasnap.shinyapps.io/climdist/">Climate Analytics</a> app uses full climate probability distributional information rather than just a specific set of precompiled statistics. As a result, it requires access to a large amount of data. This data is stored in an S3 bucket. It could not possibly be stored inside the app itself. Furthermore, the data is leveraged by other projects, and this also removes a need for data duplication.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(snapprep)
+<span class="kw">source</span>(<span class="st">"aws_key.R"</span>)  <span class="co"># SEE DETAILS</span>
+<span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="dt">in_dir =</span> <span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()$ar5dir_dist_monthly, <span class="dt">prefix =</span> <span class="st">"clim/dist/ar5_2km/monthly"</span>)
+<span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="dt">in_dir =</span> <span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()$ar5dir_dist_seasonal, <span class="dt">prefix =</span> <span class="st">"clim/dist/ar5_2km/seasonal"</span>)</code></pre></div>
+<p>This is run on an Atlas compute node using 32 processors for efficiency. See the help documentation for details. Note that it is critical to source in your AWS keys that grant you permission to your S3 bucket or this will not work.</p>
 </div>
-<div id="installation" class="section level2">
+<div id="jfsp-wildfire-projections-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install snapprep from github with:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages('devtools')</span>
-devtools::<span class="kw">install_github</span>(<span class="st">"leonawicz/snapprep"</span>)</code></pre></div>
+<a href="#jfsp-wildfire-projections-data" class="anchor"></a>JFSP wildfire projections data</h2>
+<p>This collection of data sets used by the <a href="https://uasnap.shinyapps.io/jfsp-v10/">JFSP Alaska wildfire projections</a> Shiny app is much smaller than the previous one, but still a significant benefit to utilize it from AWS once copied there. Here is an example.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="st">"jfsp/appData"</span>, <span class="st">"apps/jfsp"</span>)</code></pre></div>
 </div>
+<div id="cmip5-climate-model-evaluation-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#cmip5-climate-model-evaluation-data" class="anchor"></a>CMIP5 climate model evaluation data</h2>
+<p>Below is an example based on the data prep and upload for the <a href="https://uasnap.shinyapps.io/ar5eval/">CMIP5 GCM evalution results</a> Shiny app. As you can see, the approach remains the same regardless of the data. <code>aws_upload</code> will simply upload all files in <code>in_dir</code>. For more specific cases, pass a <code>pattern</code> argument to limit to a subset of files. If an even more custom need arises, just use the <code>aws.s3</code> package functions directly on the files you want to upload. This wrapper is provided for convenient in common use cases.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="st">"ar5eval/data"</span>, <span class="st">"apps/ar5eval"</span>)</code></pre></div>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2 class="hasAnchor">
-<a href="#sidebar" class="anchor"></a>Links</h2>
-<ul class="list-unstyled">
-<li>Report a bug at <br><a href="https://github.com/leonawicz/snapprep/issues">https://​github.com/​leonawicz/​snapprep/​issues</a>
-</li>
-</ul>
-<h2>License</h2>
-<p><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE.html">LICENSE</a></p>
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://leonawicz.github.io/">Matthew Leonawicz</a> <br><small class="roles"> Author, maintainer </small> </li>
-<li>
-<a href="http://snap.uaf.edu/"><img src="https://raw.githubusercontent.com/leonawicz/leonawicz.github.io/master/assets/img/snap_symbol.svg?sanitize=true" height="24">  Scenarios Network for Alaska and Arctic Planning</a> <br><small class="roles"> Copyright holder, funder </small> </li>
-</ul>
-<h2>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://travis-ci.org/leonawicz/snapprep"><img src="https://travis-ci.org/leonawicz/snapprep.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://ci.appveyor.com/project/leonawicz/snapprep"><img src="https://ci.appveyor.com/api/projects/status/github/leonawicz/snapprep?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
-<li><a href="https://codecov.io/github/leonawicz/snapprep?branch=master"><img src="https://img.shields.io/codecov/c/github/leonawicz/snapprep/master.svg" alt="Coverage Status"></a></li>
-</ul>
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#data-for-snap-climate-analytics">Data for SNAP Climate Analytics</a></li>
+      <li><a href="#jfsp-wildfire-projections-data">JFSP wildfire projections data</a></li>
+      <li><a href="#cmip5-climate-model-evaluation-data">CMIP5 climate model evaluation data</a></li>
+      </ul>
 </div>
+      </div>
 
 </div>
 
