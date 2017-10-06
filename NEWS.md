@@ -1,6 +1,7 @@
 # snapprep 0.2.5 (Release date: 2017-10-06)
 
 * Added `aws_upload` for uploading curated SNAP data to AWS S3 buckets for use by Shiny apps and other applications and projects.
+* Added a vignette providing example context and usage of `aws_upload` for uploading SNAP data to AWS S3 buckets as a final step in typical SNAP data prep operations.
 
 # snapprep 0.2.0 (Release date: 2017-10-06)
 
