@@ -29,6 +29,7 @@ Examples of some of the processing chains that `snapprep` is involved in include
 
 * Preparing climate distributions data frames for the `climdist` Shiny app.
 * Compiling data frames of cell indices of the intersection of commonly used SNAP polygon shapefiles with common rasterized map layers for subsequent efficient processing of large data extraction tasks.
+* Uploading curated data sets to Amazon Web Services S3 buckets for rapid access remote use by various SNAP applications and projects.
 
 ## Installation
 
