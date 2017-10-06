@@ -4,7 +4,8 @@
 \alias{aws_upload}
 \title{Upload data to Amazon Web Services}
 \usage{
-aws_upload(in_dir, prefix, bkt = "leonawicz", mc.cores = 32)
+aws_upload(in_dir, prefix, bkt = "leonawicz", pattern = NULL,
+  mc.cores = 32)
 }
 \arguments{
 \item{in_dir}{character, input directory.}
@@ -12,6 +13,8 @@ aws_upload(in_dir, prefix, bkt = "leonawicz", mc.cores = 32)
 \item{prefix}{character, optional prefix.}
 
 \item{bkt}{S3 bucket name, defaults to the author since this is a SNAP developer package.}
+
+\item{pattern}{file name pattern passed to \code{list.files} for filtering files in \code{in_dir}.}
 
 \item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
