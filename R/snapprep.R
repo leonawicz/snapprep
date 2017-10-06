@@ -5,7 +5,7 @@ globalVariables(c(".x", ".y", ".data"))
 #' \code{snapprep} is a developer package for the SNAPverse, used for preparing data sets for SNAPverse data packages.
 #'
 #' The \code{snapprep} package contains R functions used to support a wide range of SNAP projects by preparing and curating useful data sets
-#' from upstream raw SNAP data. The data sets compiled with the aid of \code{snapprep} are then made avaible to other projects.
+#' from upstream raw SNAP data. The data sets compiled with the aid of \code{snapprep} are then made available to other projects.
 #' This includes compiling data sets that are contained in SNAPverse data packages.
 #'
 #' \code{snapprep} is a developer package used by the SNAPverse author and maintainer.
