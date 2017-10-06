@@ -215,16 +215,14 @@ clim_dist_seasonal <- function(in_dir = snapdef()$ar5dir_dist_monthly,
 #' This is for convenience and they will adjust automatically based on \code{type}.
 #' If providing alternate directories, make sure to specify in accordance with your \code{type}.
 #'
-#' Use \code{variable} to optionally specify a climate variable file identifier: \code{"pr"}, \code{"tas"}, \code{"tasmin"} or \code{"tasmax"}.
+#' Use \code{region_group} to optionally specify a region group file identifier.
 #' This will be used for pattern matching when listing files inside \code{in_dir}.
-#' Similarly, use \code{rcp} to process a smaller batch.
-#' These are helpful when there are many files, such that there could be RAM or time limitations.
+#' This is helpful when there are many files, such that there could be RAM or time limitations.
 #'
 #' @param type character, \code{"monthly"} or \code{"seasonal"}.
 #' @param in_dir input directory, e.g. \code{snapdef()$ar5dir_dist_monthly} or \code{snapdef()$ar5dir_dist_seasonal}. See details.
 #' @param out_dir output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries. See details.
-#' @param variable character, optional, to split into smaller file batches. See details.
-#' @param rcp character, optional, to split into smaller file batches. See details.
+#' @param region_group character, optional, to split into smaller file batches. See details.
 #' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @export
@@ -234,7 +232,7 @@ clim_dist_seasonal <- function(in_dir = snapdef()$ar5dir_dist_monthly,
 #' clim_stats_ar5(type = "monthly")
 #' clim_stats_ar5(type = "seasonal")
 #' }
-clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, variable, rcp, mc.cores = 32){
+clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, region_group, mc.cores = 32){
   if(!type %in% c("monthly", "seasonal")) stop("`type` must be 'monthly' or 'seasonal'.")
   if(missing(in_dir)){
     if(type == "monthly") in_dir <- snapdef()$ar5dir_dist_monthly
@@ -244,8 +242,7 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, variable, rcp, mc.
     if(type == "monthly") out_dir <- snapdef()$ar5dir_dist_stats[1]
     if(type == "seasonal") out_dir <- snapdef()$ar5dir_dist_stats[2]
   }
-  pat <- if(missing(rcp)) ".rds$" else paste0(rcp, ".*.rds$")
-  pat <- if(missing(variable)) pat else paste0("^", variable, ".*.", pat)
+  pat <- if(missing(region_group)) ".rds$" else paste0("^", region_group, ".*.rds$")
   files <- list.files(in_dir, pattern = pat, recursive = TRUE)
   grp <- basename(dirname(dirname(files)))
   loc <- basename(dirname(files))
@@ -276,7 +273,6 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, variable, rcp, mc.
     files <- dplyr::mutate(files, Season = factor(f(.data[["Season"]]), levels = season_levels))
   }
   .stats <- function(i, files, in_dir, type){
-    cat(paste("File", i, "of", nrow(files), "...\n"))
     file <- file.path(in_dir, files$files[i])
     x0 <- dplyr::slice(files, i) %>% dplyr::select(-.data[["files"]])
     x <- readRDS(file) %>% rvtable::sample_rvtable() %>% dplyr::ungroup()
@@ -308,6 +304,8 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, variable, rcp, mc.
   }
   files <- split(files, paste(grp, loc, sep = "_"))
   for(j in seq_along(files)){
+    grp_loc <- strsplit(names(files)[j], "_")[[1]]
+    cat(paste0("Processing file ", j, " of ", length(files), ": ", grp_loc[1], "/", grp_loc[2], "...\n"))
     x <- parallel::mclapply(1:nrow(files[[j]]), .stats,
                             files = files[[j]], in_dir = in_dir, type = type, mc.cores = mc.cores)
     x <- dplyr::bind_rows(x)
@@ -317,7 +315,6 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, variable, rcp, mc.
     if(type == "seasonal")
       x <- dplyr::select(x, c(15:19, 1, 20, 2:14)) %>%
       dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]])
-    grp_loc <- strsplit(names(files)[j], "_")[[1]]
     dir.create(out_dir_tmp <- file.path(out_dir, grp_loc[1]), showWarnings = FALSE, recursive = TRUE)
     outfile <- paste0(out_dir_tmp, "/", grp_loc[2], "_clim_stats.rds")
     saveRDS(x, outfile)

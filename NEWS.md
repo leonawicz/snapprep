@@ -1,7 +1,7 @@
 # snapprep 0.2.0 (Release date: 2017-10-06)
 
 * Rearranged arguments in `clim_dist_seasonal`.
-* Added `variable` and `rcp` arguments to `clim_stats_ar5` to match `clim_dist_seasonal`.
+* Added `region_group` argument to `clim_stats_ar5` for file filtering to allow smaller batch processing jobs.
 
 # snapprep 0.1.9 (Release date: 2017-10-05)
 

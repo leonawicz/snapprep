@@ -91,11 +91,12 @@ clim_stats_ar5(type = "monthly")
 clim_stats_ar5(type = "seasonal")
 ```
 
-The same batch processing recommendations for seasonal distributions apply to monthly and seasonal statistics, e.g.:
+The same batch processing recommendations for seasonal distributions apply to monthly and seasonal statistics.
+The difference is that since all statistics for a given region are intended to be stored in a single file, the optional file filter argument for smaller batch processing jobs is `region_group`.
 
 ```{r cmip5_stats2, eval = FALSE}
-clim_stats_ar5(type = "monthly", variable = "pr", rcp = "historical")
-clim_stats_ar5(type = "seasonal", variable = "tasmax", rcp = "rcp85")
+clim_stats_ar5(type = "monthly", region_group = "FMZ regions")
+clim_stats_ar5(type = "seasonal", region_group = "LCC regions")
 ```
 
 Make sure to read the documentation on these functions. You should be familiar with their arguments, including any not shown in this vignette.
