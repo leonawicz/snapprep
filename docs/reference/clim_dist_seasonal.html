@@ -198,21 +198,13 @@
     <p>Compute seasonal climate data spatial probability distributions.</p>
     
 
-    <pre class="usage"><span class='fu'>clim_dist_seasonal</span>(<span class='no'>variable</span>, <span class='no'>rcp</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
-  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_seasonal</span>, <span class='kw'>density.args</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-  <span class='kw'>adjust</span> <span class='kw'>=</span> <span class='fl'>0.1</span>), <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
+    <pre class="usage"><span class='fu'>clim_dist_seasonal</span>(<span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
+  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_seasonal</span>, <span class='no'>variable</span>, <span class='no'>rcp</span>,
+  <span class='kw'>density.args</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>adjust</span> <span class='kw'>=</span> <span class='fl'>0.1</span>), <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>variable</th>
-      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
-    </tr>
-    <tr>
-      <th>rcp</th>
-      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
-    </tr>
     <tr>
       <th>in_dir</th>
       <td><p>input directory, e.g., <code>snapdef()$ar5dir_dist_monthly</code>.</p></td>
@@ -220,6 +212,14 @@
     <tr>
       <th>out_dir</th>
       <td><p>output directory, e.g., <code>snapdef()$ar5dir_dist_seasonal</code></p></td>
+    </tr>
+    <tr>
+      <th>variable</th>
+      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
+    </tr>
+    <tr>
+      <th>rcp</th>
+      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
     </tr>
     <tr>
       <th>density.args</th>

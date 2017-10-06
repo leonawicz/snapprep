@@ -219,6 +219,14 @@
       <th>mc.cores</th>
       <td><p>number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.</p></td>
     </tr>
+    <tr>
+      <th>variable</th>
+      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
+    </tr>
+    <tr>
+      <th>rcp</th>
+      <td><p>character, optional, to split into smaller file batches. See details.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -228,6 +236,10 @@ It does not need to redundantly access source downscaled geotiffs. This function
 <p>The example <code>in_dir</code> and <code>out_dir</code> shown are assumed if these arguments are missing.
 This is for convenience and they will adjust automatically based on <code>type</code>.
 If providing alternate directories, make sure to specify in accordance with your <code>type</code>.</p>
+<p>Use <code>variable</code> to optionally specify a climate variable file identifier: <code>"pr"</code>, <code>"tas"</code>, <code>"tasmin"</code> or <code>"tasmax"</code>.
+This will be used for pattern matching when listing files inside <code>in_dir</code>.
+Similarly, use <code>rcp</code> to process a smaller batch.
+These are helpful when there are many files, such that there could be RAM or time limitations.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
