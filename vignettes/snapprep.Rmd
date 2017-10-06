@@ -73,7 +73,7 @@ clim_dist_seasonal()
 It is recommended, however, to split the processing into multiple batches by using the `rcp` and `variable` arguments:
 
 ```{r cmip5_seasonal2, eval = FALSE}
-clim_dist_seasonal(rcp = "rcp60", variable = "tas")
+clim_dist_seasonal(variable = "tas", rcp = "rcp60")
 ```
 
 The options for `rcp` include `historical`, `rcp45`, `rcp60` and `rcp85`. The options for climate variable include `pr`, `tas`, `tasmin` and `tasmax`.
@@ -89,6 +89,13 @@ It offers internal parallel processing, again defaulting to the full 32 CPUs ava
 ```{r cmip5_stats, eval = FALSE}
 clim_stats_ar5(type = "monthly")
 clim_stats_ar5(type = "seasonal")
+```
+
+The same batch processing recommendations for seasonal distributions apply to monthly and seasonal statistics, e.g.:
+
+```{r cmip5_stats2, eval = FALSE}
+clim_stats_ar5(type = "monthly", variable = "pr", rcp = "historical")
+clim_stats_ar5(type = "seasonal", variable = "tasmax", rcp = "rcp85")
 ```
 
 Make sure to read the documentation on these functions. You should be familiar with their arguments, including any not shown in this vignette.

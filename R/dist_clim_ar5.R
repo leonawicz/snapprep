@@ -141,10 +141,10 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #' Similarly, use \code{rcp} to process a smaller batch.
 #' These are helpful when there are many files, such that there could be RAM or time limitations.
 #'
-#' @param variable character, optional, to split into smaller file batches. See details.
-#' @param rcp character, optional, to split into smaller file batches. See details.
 #' @param in_dir input directory, e.g., \code{snapdef()$ar5dir_dist_monthly}.
 #' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_dist_seasonal}
+#' @param variable character, optional, to split into smaller file batches. See details.
+#' @param rcp character, optional, to split into smaller file batches. See details.
 #' @param density.args arguments list passed to \code{density}.
 #' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
@@ -156,9 +156,9 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 #' clim_dist_seasonal(variable = "pr") # precipitation
 #' clim_dist_seasonal(variable = "pr", rcp = "rcp60") # precipitation and RCP 6.0
 #' }
-clim_dist_seasonal <- function(variable, rcp, in_dir = snapdef()$ar5dir_dist_monthly,
+clim_dist_seasonal <- function(in_dir = snapdef()$ar5dir_dist_monthly,
                                out_dir = snapdef()$ar5dir_dist_seasonal,
-                               density.args = list(n = 200, adjust = 0.1), mc.cores = 32){
+                               variable, rcp, density.args = list(n = 200, adjust = 0.1), mc.cores = 32){
   pat <- if(missing(rcp)) ".rds$" else paste0(rcp, ".*.rds$")
   pat <- if(missing(variable)) pat else paste0("^", variable, ".*.", pat)
   files <- list.files(in_dir, pattern = pat, recursive = TRUE)
@@ -215,9 +215,16 @@ clim_dist_seasonal <- function(variable, rcp, in_dir = snapdef()$ar5dir_dist_mon
 #' This is for convenience and they will adjust automatically based on \code{type}.
 #' If providing alternate directories, make sure to specify in accordance with your \code{type}.
 #'
+#' Use \code{variable} to optionally specify a climate variable file identifier: \code{"pr"}, \code{"tas"}, \code{"tasmin"} or \code{"tasmax"}.
+#' This will be used for pattern matching when listing files inside \code{in_dir}.
+#' Similarly, use \code{rcp} to process a smaller batch.
+#' These are helpful when there are many files, such that there could be RAM or time limitations.
+#'
 #' @param type character, \code{"monthly"} or \code{"seasonal"}.
 #' @param in_dir input directory, e.g. \code{snapdef()$ar5dir_dist_monthly} or \code{snapdef()$ar5dir_dist_seasonal}. See details.
 #' @param out_dir output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries. See details.
+#' @param variable character, optional, to split into smaller file batches. See details.
+#' @param rcp character, optional, to split into smaller file batches. See details.
 #' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @export
@@ -237,7 +244,9 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
     if(type == "monthly") out_dir <- snapdef()$ar5dir_dist_stats[1]
     if(type == "seasonal") out_dir <- snapdef()$ar5dir_dist_stats[2]
   }
-  files <- list.files(in_dir, pattern = ".rds$", recursive = TRUE)
+  pat <- if(missing(rcp)) ".rds$" else paste0(rcp, ".*.rds$")
+  pat <- if(missing(variable)) pat else paste0("^", variable, ".*.", pat)
+  files <- list.files(in_dir, pattern = pat, recursive = TRUE)
   grp <- basename(dirname(dirname(files)))
   loc <- basename(dirname(files))
   rcp_levels <- c("Historical", "4.5", "6.0", "8.5")

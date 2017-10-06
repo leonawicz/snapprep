@@ -4,18 +4,18 @@
 \alias{clim_dist_seasonal}
 \title{Compute seasonal climate data spatial distributions}
 \usage{
-clim_dist_seasonal(variable, rcp, in_dir = snapdef()$ar5dir_dist_monthly,
-  out_dir = snapdef()$ar5dir_dist_seasonal, density.args = list(n = 200,
-  adjust = 0.1), mc.cores = 32)
+clim_dist_seasonal(in_dir = snapdef()$ar5dir_dist_monthly,
+  out_dir = snapdef()$ar5dir_dist_seasonal, variable, rcp,
+  density.args = list(n = 200, adjust = 0.1), mc.cores = 32)
 }
 \arguments{
-\item{variable}{character, optional, to split into smaller file batches. See details.}
-
-\item{rcp}{character, optional, to split into smaller file batches. See details.}
-
 \item{in_dir}{input directory, e.g., \code{snapdef()$ar5dir_dist_monthly}.}
 
 \item{out_dir}{output directory, e.g., \code{snapdef()$ar5dir_dist_seasonal}}
+
+\item{variable}{character, optional, to split into smaller file batches. See details.}
+
+\item{rcp}{character, optional, to split into smaller file batches. See details.}
 
 \item{density.args}{arguments list passed to \code{density}.}
 
