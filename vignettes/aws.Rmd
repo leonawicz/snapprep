@@ -1,0 +1,56 @@
+---
+title: "Uploading SNAP dat to AWS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Uploading SNAP dat to AWS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE, error = FALSE, tidy = TRUE
+)
+```
+
+The `snapprep` R package makes it easy to upload curated data sets to Amazon Web Services for use by Shiny apps and other projects.
+This is done with `aws_upload`. It uploads data to an S3 bucket specified by `bkt`.
+The other arguments are `in_dir` for an input directory containing (recursively) all files to be uploaded and `prefix`, an optional string to place
+before each file name describing, for example, the desired pseudo-directory structure for the files placed in the bucket.
+Since this is a SNAP developer package rather than a user package, the default bucket is set to the author's default bucket.
+See the example below.
+
+## Data for SNAP Climate Analytics
+
+The SNAP [Climate Analytics](https://uasnap.shinyapps.io/climdist/) app uses full climate probability distributional information rather than just a specific set of precompiled statistics. As a result, it requires access to a large amount of data. This data is stored in an S3 bucket. It could not possibly be stored inside the app itself. Furthermore, the data is leveraged by other projects, and this also removes a need for data duplication.
+
+```{r climdist_app, eval = FALSE}
+library(snapprep)
+source("aws_key.R") # SEE DETAILS
+aws_upload(in_dir = snapdef()$ar5dir_dist_monthly, prefix = "clim/dist/ar5_2km/monthly")
+aws_upload(in_dir = snapdef()$ar5dir_dist_seasonal, prefix = "clim/dist/ar5_2km/seasonal")
+```
+
+This is run on an Atlas compute node using 32 processors for efficiency. See the help documentation for details.
+Note that it is critical to source in your AWS keys that grant you permission to your S3 bucket or this will not work.
+
+## JFSP wildfire projections data
+
+This collection of data sets used by the [JFSP Alaska wildfire projections](https://uasnap.shinyapps.io/jfsp-v10/) Shiny app is much smaller than the previous one, but still a significant benefit to utilize it from AWS once copied there.
+Here is an example.
+
+```{r jfsp_app, eval = FALSE}
+aws_upload("jfsp/appData", "apps/jfsp")
+```
+
+## CMIP5 climate model evaluation data
+
+Below is an example based on the data prep and upload for the [CMIP5 GCM evalution results](https://uasnap.shinyapps.io/ar5eval/) Shiny app.
+As you can see, the approach remains the same regardless of the data. `aws_upload` will simply upload all files in `in_dir`.
+For more specific cases, pass a `pattern` argument to limit to a subset of files.
+If an even more custom need arises, just use the `aws.s3` package functions directly on the files you want to upload.
+This wrapper is provided for convenient in common use cases.
+
+```{r ar5eval_app, eval = FALSE}
+aws_upload("ar5eval/data", "apps/ar5eval")
+```
