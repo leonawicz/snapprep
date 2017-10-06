@@ -242,8 +242,8 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, region_group, mc.c
     if(type == "monthly") out_dir <- snapdef()$ar5dir_dist_stats[1]
     if(type == "seasonal") out_dir <- snapdef()$ar5dir_dist_stats[2]
   }
-  pat <- if(missing(region_group)) ".rds$" else paste0("^", region_group, ".*.rds$")
-  files <- list.files(in_dir, pattern = pat, recursive = TRUE)
+  files <- list.files(in_dir, pattern = ".rds$", recursive = TRUE)
+  if(!missing(region_group)) files <- files[substr(files, 1, nchar(region_group)) == region_group]
   grp <- basename(dirname(dirname(files)))
   loc <- basename(dirname(files))
   rcp_levels <- c("Historical", "4.5", "6.0", "8.5")
