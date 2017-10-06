@@ -4,7 +4,8 @@
 \alias{clim_stats_ar5}
 \title{Compute climate statistics}
 \usage{
-clim_stats_ar5(type = "monthly", in_dir, out_dir, mc.cores = 32)
+clim_stats_ar5(type = "monthly", in_dir, out_dir, variable, rcp,
+  mc.cores = 32)
 }
 \arguments{
 \item{type}{character, \code{"monthly"} or \code{"seasonal"}.}
@@ -13,11 +14,11 @@ clim_stats_ar5(type = "monthly", in_dir, out_dir, mc.cores = 32)
 
 \item{out_dir}{output directory, e.g. one of the \code{snapdef()$ar5dir_dist_stats} entries. See details.}
 
-\item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
-
 \item{variable}{character, optional, to split into smaller file batches. See details.}
 
 \item{rcp}{character, optional, to split into smaller file batches. See details.}
+
+\item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \description{
 Compute climate statistics from spatial probability distributions.

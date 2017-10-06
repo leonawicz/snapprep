@@ -234,7 +234,7 @@ clim_dist_seasonal <- function(in_dir = snapdef()$ar5dir_dist_monthly,
 #' clim_stats_ar5(type = "monthly")
 #' clim_stats_ar5(type = "seasonal")
 #' }
-clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
+clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, variable, rcp, mc.cores = 32){
   if(!type %in% c("monthly", "seasonal")) stop("`type` must be 'monthly' or 'seasonal'.")
   if(missing(in_dir)){
     if(type == "monthly") in_dir <- snapdef()$ar5dir_dist_monthly
