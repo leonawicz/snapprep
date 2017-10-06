@@ -261,9 +261,7 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
     RCP = factor(relabel_rcps(.data[["RCP"]]), levels = rcp_levels),
     GCM = factor(factor(ifelse(.data[["GCM"]] == "ts40", "CRU 4.0", .data[["GCM"]]),
                         levels = model_levels)),
-    Var = factor(.data[["Var"]], levels = c("pr", "tas", "tasmin", "tasmax")),
-    Group = factor(.data[["Group"]], levels = sort(unique(grp))),
-    Region = factor(.data[["Region"]], levels = sort(unique(loc)))
+    Var = factor(.data[["Var"]], levels = c("pr", "tas", "tasmin", "tasmax"))
   )
   if(type == "seasonal"){
     files <- dplyr::mutate(files, Season = factor(f(.data[["Season"]]), levels = season_levels))
@@ -282,6 +280,8 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
       Mean = round(mean(.data[["Val"]]), 1),
       SD = round(stats::sd(.data[["Val"]]), 1),
       Min = round(min(.data[["Val"]]), 1),
+      Max = round(max(.data[["Val"]]), 1),
+      Pct_025 = round(stats::quantile(.data[["Val"]], 0.025), 1),
       Pct_05 = round(stats::quantile(.data[["Val"]], 0.05), 1),
       Pct_10 = round(stats::quantile(.data[["Val"]], 0.10), 1),
       Pct_25 = round(stats::quantile(.data[["Val"]], 0.25), 1),
@@ -289,7 +289,7 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
       Pct_75 = round(stats::quantile(.data[["Val"]], 0.75), 1),
       Pct_90 = round(stats::quantile(.data[["Val"]], 0.90), 1),
       Pct_95 = round(stats::quantile(.data[["Val"]], 0.95), 1),
-      Max = round(max(.data[["Val"]]), 1)) %>%
+      Pct_975 = round(stats::quantile(.data[["Val"]], 0.975), 1)) %>%
     dplyr::ungroup() %>% dplyr::mutate(
       RCP = x0$RCP, GCM = x0$GCM, Var = x0$Var, Group = x0$Group, Region = x0$Region)
     if(type == "monthly") x <- dplyr::mutate(
@@ -303,13 +303,11 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, mc.cores = 32){
                             files = files[[j]], in_dir = in_dir, type = type, mc.cores = mc.cores)
     x <- dplyr::bind_rows(x)
     if(type == "monthly")
-      x <- dplyr::select(x, c(14:18, 1:13)) %>%
-      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Region"]],
-                     .data[["Year"]], .data[["Month"]])
+      x <- dplyr::select(x, c(16:20, 1:15)) %>%
+      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Month"]])
     if(type == "seasonal")
-      x <- dplyr::select(x, c(13:17, 1, 18, 2:12)) %>%
-      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Region"]],
-                     .data[["Year"]], .data[["Season"]])
+      x <- dplyr::select(x, c(15:19, 1, 20, 2:14)) %>%
+      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]])
     grp_loc <- strsplit(names(files)[j], "_")[[1]]
     dir.create(out_dir_tmp <- file.path(out_dir, grp_loc[1]), showWarnings = FALSE, recursive = TRUE)
     outfile <- paste0(out_dir_tmp, "/", grp_loc[2], "_clim_stats.rds")
