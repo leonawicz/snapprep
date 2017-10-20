@@ -147,9 +147,9 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
 split_monthly_files <- function(in_dir = snapdef()$ar5dir_dist_monthly,
                                 out_dir = snapdef()$ar5dir_dist_monthly_split, mc.cores = 32){
   files <- list.files(in_dir, pattern = ".rds$", recursive = TRUE)
-  load_split_save <- function(file, idx = c(paste0(0, 1:9), 10:12)){
+  load_split_save <- function(file, in_dir, out_dir, idx = c(paste0(0, 1:9), 10:12)){
     dir.create(file.path(out_dir, dirname(file)), recursive = TRUE, showWarnings = FALSE)
-    x <- readRDS(file) %>% split(.$Month)
+    x <- readRDS(file.path(in_dir, file)) %>% split(.$Month)
     purrr::walk2(x, idx, ~({
       out <- file.path(out_dir, gsub("\\.rds", paste0("_", .y, ".rds"), file))
       saveRDS(.x, out)
