@@ -1,4 +1,4 @@
-globalVariables(c(".x", ".y", ".data"))
+globalVariables(c(".", ".x", ".y", ".data"))
 
 #' snapprep: R functions for data prep and curation from raw SNAP data.
 #'
