@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • snapprep</title>
+<title>Split grouped monthly files into individual files � split_monthly_files • snapprep</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -49,7 +49,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -201,121 +201,55 @@
       </header>
 
       <div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;0.2.5</small>
-      </h1>
+    <h1>Split grouped monthly files into individual files</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    
+    <p>Split grouped monthly climate files into individual monthly files with <code>01</code> through <code>12</code> suffix in file names.</p>
+    
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <pre class="usage"><span class='fu'>split_monthly_files</span>(<span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
+  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly_split</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>in_dir</th>
+      <td><p>input directory, e.g., <code>snapdef()$ar5dir_dist_monthly</code>.</p></td>
+    </tr>
+    <tr>
+      <th>out_dir</th>
+      <td><p>output directory, e.g., <code>snapdef()$ar5dir_dist_monthly_split</code></p></td>
+    </tr>
+    <tr>
+      <th>mc.cores</th>
+      <td><p>number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-package" class="hasAnchor"><a href="#section-package" class="anchor"></a>Package</h2>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="snapprep.html">snapprep</a></code> </p>
-          </td>
-          <td><p>snapprep: R functions for data prep and curation from raw SNAP data.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-default-options" class="hasAnchor"><a href="#section-default-options" class="anchor"></a>Default options</h2>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="snapdef.html">snapdef</a></code> </p>
-          </td>
-          <td><p>A function that returns a list of SNAP defaults such as path names to data sets and lists of available climate variables and models, etc.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-ar-downscaled-climate" class="hasAnchor"><a href="#section-ar-downscaled-climate" class="anchor"></a>AR5 downscaled climate</h2>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="clim_inputs_table.html">clim_inputs_table</a></code> </p>
-          </td>
-          <td><p>Prepare inputs table for climate data extraction</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="clim_dist_monthly.html">clim_dist_monthly</a></code> </p>
-          </td>
-          <td><p>Extract climate data and compute distributions</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="clim_dist_seasonal.html">clim_dist_seasonal</a></code> </p>
-          </td>
-          <td><p>Compute seasonal climate data spatial distributions</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="split_monthly_files.html">split_monthly_files</a></code> </p>
-          </td>
-          <td><p>Split grouped monthly files into individual files</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="clim_stats_ar5.html">clim_stats_ar5</a></code> </p>
-          </td>
-          <td><p>Compute climate statistics</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-subregion-grid-cell-tables" class="hasAnchor"><a href="#section-subregion-grid-cell-tables" class="anchor"></a>Subregion grid cell tables</h2>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="snap_poly_list.html">snap_poly_list</a></code> </p>
-          </td>
-          <td><p>Generate nested list of spatial polygons data frames</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="save_poly_cells.html">save_poly_cells</a></code> </p>
-          </td>
-          <td><p>Save rds files containing raster cell tables for polygons</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+    <p>This function trades fewer files for smaller files and can be preferable for data fetched from AWS in Shiny apps.</p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'>split_monthly_files</span>()
+<span class='co'># }</span></pre>
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-package">Package</a></li>
-      <li><a href="#section-default-options">Default options</a></li>
-      <li><a href="#section-ar-downscaled-climate">AR5 downscaled climate</a></li>
-      <li><a href="#section-subregion-grid-cell-tables">Subregion grid cell tables</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#details">Details</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
     </ul>
+
   </div>
 </div>
 
