@@ -20,18 +20,19 @@
 #' @examples
 #' \dontrun{
 #' source("aws_key.R") # SEE DETAILS
-#' aws_upload(snapdef()$ar5dir_dist_monthly, "clim/dist/ar5_2km/monthly")
+#' aws_upload(snapdef()$ar5dir_dist_monthly_split, "clim/dist/ar5_2km/monthly")
 #' aws_upload(snapdef()$ar5dir_dist_seasonal, "clim/dist/ar5_2km/seasonal")
 #' }
 aws_upload <- function(in_dir, prefix, bkt = "leonawicz", pattern = NULL, mc.cores = 32){
-  files <- list.files(in_dir, pattern = pattern, full.names = TRUE, recursive = TRUE)
-  objs <- file.path(prefix, basename(files))
-  aws_put <- function(i, files, objs, bkt){
+  files <- list.files(in_dir, pattern = pattern, recursive = TRUE)
+  objs <- file.path(prefix, files)
+  aws_put <- function(i, in_dir, files, objs, bkt){
     cat(paste0("Uploading to AWS: ", files[i], "\n"))
-    aws.s3::put_object(file = files[i], object = objs[i], bucket = bkt)
+    aws.s3::put_object(file = file.path(in_dir, files[i]), object = objs[i], bucket = bkt)
     invisible()
   }
-  parallel::mclapply(seq_along(files), aws_put, files = files, objs = objs, bkt = bkt, mc.cores = mc.cores)
+  parallel::mclapply(seq_along(files), aws_put, in_dir = in_dir, files = files, objs = objs,
+                     bkt = bkt, mc.cores = mc.cores)
   cat(paste0("Files uploaded to ", bkt, "/", prefix, ".\n"))
   invisible()
 }
