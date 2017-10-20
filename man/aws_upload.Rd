@@ -5,7 +5,7 @@
 \title{Upload data to Amazon Web Services}
 \usage{
 aws_upload(in_dir, prefix, bkt = "leonawicz", pattern = NULL,
-  mc.cores = 32)
+  region_group = NULL, mc.cores = 32)
 }
 \arguments{
 \item{in_dir}{character, input directory.}
@@ -15,6 +15,8 @@ aws_upload(in_dir, prefix, bkt = "leonawicz", pattern = NULL,
 \item{bkt}{S3 bucket name, defaults to the author since this is a SNAP developer package.}
 
 \item{pattern}{file name pattern passed to \code{list.files} for filtering files in \code{in_dir}.}
+
+\item{region_group}{region group used to further filter files in \code{in_dir}.}
 
 \item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
@@ -32,7 +34,7 @@ NOTE: This function will not work unless the AWS keys granting permission to the
 \examples{
 \dontrun{
 source("aws_key.R") # SEE DETAILS
-aws_upload(snapdef()$ar5dir_dist_monthly, "clim/dist/ar5_2km/monthly")
+aws_upload(snapdef()$ar5dir_dist_monthly_split, "clim/dist/ar5_2km/monthly")
 aws_upload(snapdef()$ar5dir_dist_seasonal, "clim/dist/ar5_2km/seasonal")
 }
 }

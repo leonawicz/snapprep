@@ -13,6 +13,7 @@
 #' @param prefix character, optional prefix.
 #' @param bkt S3 bucket name, defaults to the author since this is a SNAP developer package.
 #' @param pattern file name pattern passed to \code{list.files} for filtering files in \code{in_dir}.
+#' @param region_group region group used to further filter files in \code{in_dir}.
 #' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @export
@@ -23,8 +24,11 @@
 #' aws_upload(snapdef()$ar5dir_dist_monthly_split, "clim/dist/ar5_2km/monthly")
 #' aws_upload(snapdef()$ar5dir_dist_seasonal, "clim/dist/ar5_2km/seasonal")
 #' }
-aws_upload <- function(in_dir, prefix, bkt = "leonawicz", pattern = NULL, mc.cores = 32){
+aws_upload <- function(in_dir, prefix, bkt = "leonawicz", pattern = NULL, region_group = NULL,
+                       mc.cores = 32){
   files <- list.files(in_dir, pattern = pattern, recursive = TRUE)
+  if(inherits(region_group, "character"))
+    files <- files[basename(dirname(dirname(files))) == region_group]
   objs <- file.path(prefix, files)
   aws_put <- function(i, in_dir, files, objs, bkt){
     cat(paste0("Uploading to AWS: ", files[i], "\n"))
