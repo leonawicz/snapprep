@@ -24,6 +24,7 @@ reference:
   - clim_inputs_table
   - clim_dist_monthly
   - clim_dist_seasonal
+  - split_monthly_files
   - clim_stats_ar5
 - title: Subregion grid cell tables
   contents:

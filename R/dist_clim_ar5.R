@@ -128,6 +128,38 @@ clim_dist_monthly <- function(inputs, in_dir = snapdef()$ar5dir,
   invisible()
 }
 
+#' Split grouped monthly files into individual files
+#'
+#' Split grouped monthly climate files into individual monthly files with \code{01} through \code{12} suffix in file names.
+#'
+#' This function trades fewer files for smaller files and can be preferable for data fetched from AWS in Shiny apps.
+#'
+#' @param in_dir input directory, e.g., \code{snapdef()$ar5dir_dist_monthly}.
+#' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_dist_monthly_split}
+#' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' split_monthly_files()
+#' }
+split_monthly_files <- function(in_dir = snapdef()$ar5dir_dist_monthly,
+                                out_dir = snapdef()$ar5dir_dist_monthly_split, mc.cores = 32){
+  files <- list.files(in_dir, pattern = ".rds$", recursive = TRUE)
+  load_split_save <- function(file, idx = c(paste0(0, 1:9), 10:12)){
+    dir.create(file.path(out_dir, dirname(file)), recursive = TRUE, showWarnings = FALSE)
+    x <- readRDS(file) %>% split(.$Month)
+    purrr::walk2(x, idx, ~({
+      out <- file.path(out_dir, gsub("\\.rds", paste0("_", .y, ".rds"), file))
+      saveRDS(.x, out)
+    })
+    )
+  }
+  parallel::mclapply(files, load_split_save, in_dir = in_dir, out_dir = out_dir, mc.cores = mc.cores)
+  invisible()
+}
+
 #' Compute seasonal climate data spatial distributions
 #'
 #' Compute seasonal climate data spatial probability distributions.

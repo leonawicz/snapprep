@@ -50,6 +50,12 @@ of climate variables for all these source data sets.
 Outputs are saved to a directory containing groups of regions. Each region group contains subdirectories of related subregions.
 These directories contain the .rds files.
 
+If it is important to keep monthly files on disk rather than annual files containing all months' data, the step above can be followed up with `split_monthly_files`, which will split the original 12-month files into 12 single-month files and store the new structure in another directory.
+
+```{r cmip5_monthly2, eval = FALSE}
+split_monthly_files()
+```
+
 The regions for which spatial distributions are estimated are taken from 
 the 2-km level locations listed in `snapdef()$cells_akcan1km2km`, which is made by `snapprep::save_poly_cells` and
 itself uses common SNAP polygons that can be found in the `snappoly` SNAPverse data package.
