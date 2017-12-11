@@ -1,3 +1,14 @@
+# snapprep 0.2.7
+
+* Added functions for extracting and curating point location climate data.
+
+# snapprep 0.2.6 (Release date: 2017-10-20)
+
+* Added `split_monthly_files` function for alternative file structure for outputs.
+* Added `region_group` argument to `aws_upload` for file filtering by region group.
+* Minor bug fixes.
+* Updated documentation.
+
 # snapprep 0.2.5 (Release date: 2017-10-06)
 
 * Added `aws_upload` for uploading curated SNAP data to AWS S3 buckets for use by Shiny apps and other applications and projects.
