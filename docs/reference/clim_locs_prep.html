@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Split grouped monthly files into individual files — split_monthly_files â€¢ snapprep</title>
+<title>Extract climate values for point locations — clim_locs_prep â€¢ snapprep</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -203,41 +203,56 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Split grouped monthly files into individual files</h1>
+    <h1>Extract climate values for point locations</h1>
     </div>
 
     
-    <p>Split grouped monthly climate files into individual monthly files with <code>01</code> through <code>12</code> suffix in file names.</p>
+    <p>Extract monthly climate values for point locations by RCP, climate model and climate variable.</p>
     
 
-    <pre class="usage"><span class='fu'>split_monthly_files</span>(<span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly</span>,
-  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_dist_monthly_split</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
+    <pre class="usage"><span class='fu'>clim_locs_prep</span>(<span class='no'>inputs</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir</span>,
+  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>inputs</th>
+      <td><p>data frame of inputs (one row). See details.</p></td>
+    </tr>
+    <tr>
       <th>in_dir</th>
-      <td><p>input directory, e.g., <code>snapdef()$ar5dir_dist_monthly</code>.</p></td>
+      <td><p>input directory, e.g., <code>snapdef()$ar5dir</code>.</p></td>
     </tr>
     <tr>
       <th>out_dir</th>
-      <td><p>output directory, e.g., <code>snapdef()$ar5dir_dist_monthly_split</code></p></td>
+      <td><p>output directory, e.g., <code>snapdef()$ar5dir_locs</code></p></td>
     </tr>
     <tr>
-      <th>mc.cores</th>
-      <td><p>number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.</p></td>
+      <th>verbose</th>
+      <td><p>logical, verbose progress.</p></td>
+    </tr>
+    <tr>
+      <th>overwrite</th>
+      <td><p>logical, overwrite existing files.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function trades fewer files for smaller files and can be preferable for data fetched from AWS in Shiny apps.</p>
+    <p><code>inputs</code> generally comes from <a href='clim_inputs_table.html'>clim_inputs_table</a>. <code>clim_locs_prep</code> processes data sets referred to by
+one row of this data frame at a time. This function generates intermediary temp files used susbsequently by <code><a href='clim_locs.html'>clim_locs</a></code>
+and can be deleted afterward if not needed for other uses where it is convenient to have extracted point location climate data
+segmented into files by RCP, model and variable as opposed to by point location.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>split_monthly_files</span>()
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+<span class='fu'>library</span>(<span class='no'>parallel</span>)
+<span class='fu'><a href='clim_inputs_table.html'>clim_inputs_table</a></span>() <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(!(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"ts40"</span> <span class='kw'>&amp;</span> <span class='no'>var</span> <span class='kw'>%in%</span> <span class='fu'>c</span>(<span class='st'>"tasmin"</span>, <span class='st'>"tasmax"</span>)))
+<span class='fu'><a href='http://www.rdocumentation.org/packages/parallel/topics/mcdummies'>mclapply</a></span>(<span class='fu'>split</span>(<span class='no'>inputs</span>, <span class='fl'>1</span>:<span class='fu'>nrow</span>(<span class='no'>inputs</span>)), <span class='no'>clim_locs_prep</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

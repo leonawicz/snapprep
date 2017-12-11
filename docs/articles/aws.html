@@ -39,7 +39,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -192,8 +192,8 @@
 <p>The SNAP <a href="https://uasnap.shinyapps.io/climdist/">Climate Analytics</a> app uses full climate probability distributional information rather than just a specific set of precompiled statistics. As a result, it requires access to a large amount of data. This data is stored in an S3 bucket. It could not possibly be stored inside the app itself. Furthermore, the data is leveraged by other projects, and this also removes a need for data duplication.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(snapprep)
 <span class="kw">source</span>(<span class="st">"aws_key.R"</span>)  <span class="co"># SEE DETAILS</span>
-<span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="dt">in_dir =</span> <span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()$ar5dir_dist_monthly, <span class="dt">prefix =</span> <span class="st">"clim/dist/ar5_2km/monthly"</span>)
-<span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="dt">in_dir =</span> <span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()$ar5dir_dist_seasonal, <span class="dt">prefix =</span> <span class="st">"clim/dist/ar5_2km/seasonal"</span>)</code></pre></div>
+<span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="dt">in_dir =</span> <span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()<span class="op">$</span>ar5dir_dist_monthly, <span class="dt">prefix =</span> <span class="st">"clim/dist/ar5_2km/monthly"</span>)
+<span class="kw"><a href="../reference/aws_upload.html">aws_upload</a></span>(<span class="dt">in_dir =</span> <span class="kw"><a href="../reference/snapdef.html">snapdef</a></span>()<span class="op">$</span>ar5dir_dist_seasonal, <span class="dt">prefix =</span> <span class="st">"clim/dist/ar5_2km/seasonal"</span>)</code></pre></div>
 <p>This is run on an Atlas compute node using 32 processors for efficiency. See the help documentation for details. Note that it is critical to source in your AWS keys that grant you permission to your S3 bucket or this will not work.</p>
 </div>
 <div id="jfsp-wildfire-projections-data" class="section level2">
