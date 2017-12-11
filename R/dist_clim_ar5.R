@@ -297,8 +297,8 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, region_group, mc.c
   files <- dplyr::mutate(
     files,
     RCP = factor(relabel_rcps(.data[["RCP"]]), levels = rcp_levels),
-    GCM = factor(factor(ifelse(.data[["GCM"]] == "ts40", "CRU 4.0", .data[["GCM"]]),
-                        levels = model_levels)),
+    GCM = factor(ifelse(.data[["GCM"]] == "ts40", "CRU 4.0", .data[["GCM"]]),
+                        levels = model_levels),
     Var = factor(.data[["Var"]], levels = c("pr", "tas", "tasmin", "tasmax"))
   )
   if(type == "seasonal"){
@@ -351,5 +351,110 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, region_group, mc.c
     outfile <- paste0(out_dir_tmp, "/", grp_loc[2], "_clim_stats.rds")
     saveRDS(x, outfile)
   }
+  invisible()
+}
+
+#' Extract climate values for point locations
+#'
+#' Extract monthly climate values for point locations by RCP, climate model and climate variable.
+#'
+#' \code{inputs} generally comes from \link{clim_inputs_table}. \code{clim_locs_prep} processes data sets referred to by
+#' one row of this data frame at a time. This function generates intermediary temp files used susbsequently by \code{\link{clim_locs}}
+#' and can be deleted afterward if not needed for other uses where it is convenient to have extracted point location climate data
+#' segmented into files by RCP, model and variable as opposed to by point location.
+#'
+#' @param inputs data frame of inputs (one row). See details.
+#' @param in_dir input directory, e.g., \code{snapdef()$ar5dir}.
+#' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_locs}
+#' @param verbose logical, verbose progress.
+#' @param overwrite logical, overwrite existing files.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library(dplyr)
+#' library(parallel)
+#' clim_inputs_table() %>%
+#'   filter(!(model == "ts40" & var %in% c("tasmin", "tasmax")))
+#' mclapply(split(inputs, 1:nrow(inputs)), clim_locs_prep)
+#' }
+clim_locs_prep <- function(inputs, in_dir = snapdef()$ar5dir,
+  out_dir = snapdef()$ar5dir_locs, verbose = TRUE, overwrite = FALSE){
+  if(nrow(inputs) != 1)
+    stop("`inputs` must be a single-row data frame (one row from `clim_inputs_table`).")
+  locs <- snaplocs::locs
+  rcp <- inputs$rcp
+  model <- inputs$model
+  variable <- inputs$var
+  rcp_levels <- c("Historical", "4.5", "6.0", "8.5")
+  relabel_rcps <- function(x) sapply(
+    x, function(x) switch(x, historical = "Historical", rcp45 = "4.5", rcp60 = "6.0", rcp85 = "8.5"))
+  model_levels <- c("CRU 4.0", "NCAR-CCSM4", "GFDL-CM3", "GISS-E2-R", "IPSL-CM5A-LR", "MRI-CGCM3")
+  files <- .get_clim_files(rcp, model, variable, in_dir)
+  template <- raster::raster(files$files[1])
+  cells <- raster::cellFromXY(template, snaplocs::wgs2ak(locs[, 3:4]))
+  verbose <- if(verbose) TRUE else FALSE
+  x0 <- raster::extract(raster::stack(files$files, quick = TRUE), cells)
+  if(verbose) cat("Matrix in memory...\n")
+  dir.create(tmpDir <- file.path(out_dir, "tempfiles"), showWarnings = FALSE, recursive = TRUE)
+  file <- paste0(tmpDir, "/", "locs_", variable, "_", rcp, "_", model, ".rds")
+  if(!overwrite && exists(file)) next
+  x <- tibble::data_frame(RCP = factor(relabel_rcps(rcp), levels = rcp_levels),
+                          GCM = factor(ifelse(model == "ts40", "CRU 4.0", model), levels = model_levels),
+                          Var = factor(variable, levels = c("pr", "tas", "tasmin", "tasmax")),
+                          Year = as.integer(rep(files$years, each = nrow(x0))),
+                          Month = factor(rep(month.abb[as.integer(files$months)], each = nrow(x0)), levels = month.abb),
+                          Mean = as.numeric(x0),
+                          LocGroup = rep(locs$region, ncol(x0)),
+                          Location = rep(locs$loc, ncol(x0)))
+  saveRDS(x, file)
+  invisible()
+}
+
+#' Under development...
+#'
+#' Function under development...
+#'
+#' @param x a data frame.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' clim_locs(x)
+#' }
+clim_locs <- function(x){
+  .seasonal <- function(x, season){
+    .season <- function(x, months){
+      yrs <- range(x$Year)
+      x <- dplyr::filter(x, .data[["Month"]] %in% months) # nolint
+      if(any(months == "Dec")){
+        y <- dplyr::mutate(
+          x, Year = ifelse(.data[["Month"]] == "Dec", .data[["Year"]] + 1L, .data[["Year"]])) %>% # nolint
+          dplyr::filter(.data[["Year"]] > yrs[1] & .data[["Year"]] <= yrs[2]) # nolint
+        x <- dplyr::filter(x, .data[["Year"]] == yrs[1]) %>% dplyr::bind_rows(y) # nolint
+      }
+      x
+    }
+    season_levels <- c("Annual", "Winter", "Spring", "Summer", "Autumn")
+    x <- switch(season,
+                "Annual" = x,
+                "Winter" = .season(x, month.abb[c(1, 2, 12)]),
+                "Spring" = .season(x, month.abb[3:5]),
+                "Summer" = .season(x, month.abb[6:8]),
+                "Autumn" = .season(x, month.abb[9:11]))
+    x <- dplyr::group_by(x, .data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]]) %>%
+      dplyr::summarise(Mean = ifelse(.data[["Var"]] == "pr",
+                                     round(mean(.data[["Mean"]])), round(mean(.data[["Mean"]])))) %>%
+      dplyr::mutate(Season = factor(season, levels = season_levels)) %>%
+      dplyr::select(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]],
+                    .data[["Mean"]])
+  }
+  .seasonal(x, "Annual")
+  .seasonal(x, "Winter")
+  .seasonal(x, "Spring")
+  .seasonal(x, "Summer")
+  .seasonal(x, "Autumn")
   invisible()
 }
