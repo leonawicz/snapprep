@@ -461,7 +461,7 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
       dplyr::summarise(Mean = round(mean(.data[["Mean"]]), 1)) %>% dplyr::ungroup() %>%
       dplyr::mutate(Mean = ifelse(
         .data[["Var"]] == "pr", round(.data[["Mean"]]), round(.data[["Mean"]], 1))) %>%
-      dplyr::ungroup() %>% dplyr::mutate(Season = factor(season, levels = season_levels)) %>%
+      dplyr::mutate(Season = factor(season, levels = season_levels)) %>%
       dplyr::select(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
                     .data[["Year"]], .data[["Season"]], .data[["Mean"]])
   }
@@ -477,8 +477,11 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
     cat("Processing", loc, "...\n")
     dir.create(mon_dir <- file.path(out_dir, "monthly", lg), recursive = TRUE, showWarnings = FALSE)
     file <- paste0(gsub("/", "--", loc), "_clim_stats.rds")
-    if(overwrite || !file.exists(file.path(mon_dir, file)))
+    if(overwrite || !file.exists(file.path(mon_dir, file))){
+      x <- dplyr::select(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
+                         .data[["Year"]], .data[["Month"]], .data[["Mean"]])
       tryCatch(saveRDS(x, file.path(mon_dir, file)), error = function(e) { cat("Error saving", file, "\n") }) # nolint
+    }
     dir.create(sea_dir <- file.path(out_dir, "seasonal", lg), recursive = TRUE, showWarnings = FALSE)
     dir.create(dec1_dir <- file.path(out_dir, "decavg", "monthly", lg), recursive = TRUE, showWarnings = FALSE)
     dir.create(dec2_dir <- file.path(out_dir, "decavg", "seasonal", lg), recursive = TRUE, showWarnings = FALSE)
@@ -495,7 +498,7 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
     }
     dir.create(dec_dir <- file.path(out_dir, "decavg", "monthly", lg), recursive = TRUE, showWarnings = FALSE)
     if(overwrite || !file.exists(file.path(dec_dir, file))){
-      x <- dplyr::mutate(x, Decade = as.integer(.data[["Year"]] %% 10 - .data[["Year"]])) %>%
+      x <- dplyr::mutate(x, Decade = as.integer(.data[["Year"]] - .data[["Year"]] %% 10)) %>%
         dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
                         .data[["Decade"]], .data[["Month"]]) %>%
         dplyr::summarise_if(is.double, function(x) round(mean(x), 1)) %>% dplyr::ungroup()
@@ -503,7 +506,7 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
     }
     dir.create(dec_dir <- file.path(out_dir, "decavg", "seasonal", lg), recursive = TRUE, showWarnings = FALSE)
     if(overwrite || !file.exists(file.path(dec_dir, file))){
-      x <- dplyr::mutate(xs, Decade = as.integer(.data[["Year"]] %% 10 - .data[["Year"]])) %>%
+      x <- dplyr::mutate(xs, Decade = as.integer(.data[["Year"]] - .data[["Year"]] %% 10)) %>%
         dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
                         .data[["Decade"]], .data[["Season"]]) %>%
         dplyr::summarise_if(is.double, function(x) round(mean(x), 1)) %>% dplyr::ungroup()
