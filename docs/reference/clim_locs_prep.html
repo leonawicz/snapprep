@@ -211,7 +211,7 @@
     
 
     <pre class="usage"><span class='fu'>clim_locs_prep</span>(<span class='no'>inputs</span>, <span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir</span>,
-  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs_prep</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -226,7 +226,7 @@
     </tr>
     <tr>
       <th>out_dir</th>
-      <td><p>output directory, e.g., <code>snapdef()$ar5dir_locs</code></p></td>
+      <td><p>output directory, e.g., <code>snapdef()$ar5dir_locs_prep</code></p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -250,9 +250,9 @@ segmented into files by RCP, model and variable as opposed to by point location.
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='fu'>library</span>(<span class='no'>dplyr</span>)
 <span class='fu'>library</span>(<span class='no'>parallel</span>)
-<span class='fu'><a href='clim_inputs_table.html'>clim_inputs_table</a></span>() <span class='kw'>%&gt;%</span>
+<span class='no'>inputs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='clim_inputs_table.html'>clim_inputs_table</a></span>() <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(!(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"ts40"</span> <span class='kw'>&amp;</span> <span class='no'>var</span> <span class='kw'>%in%</span> <span class='fu'>c</span>(<span class='st'>"tasmin"</span>, <span class='st'>"tasmax"</span>)))
-<span class='fu'><a href='http://www.rdocumentation.org/packages/parallel/topics/mcdummies'>mclapply</a></span>(<span class='fu'>split</span>(<span class='no'>inputs</span>, <span class='fl'>1</span>:<span class='fu'>nrow</span>(<span class='no'>inputs</span>)), <span class='no'>clim_locs_prep</span>)
+<span class='fu'><a href='http://www.rdocumentation.org/packages/parallel/topics/mcdummies'>mclapply</a></span>(<span class='fu'>split</span>(<span class='no'>inputs</span>, <span class='fl'>1</span>:<span class='fu'>nrow</span>(<span class='no'>inputs</span>)), <span class='no'>clim_locs_prep</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
