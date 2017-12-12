@@ -5,24 +5,20 @@
 \title{Arrange extracted climate values for point locations by location.}
 \usage{
 clim_locs(in_dir = snapdef()$ar5dir_locs_prep,
-  out_dir = snapdef()$ar5dir_locs, mc.cores = 32)
+  out_dir = snapdef()$ar5dir_locs, overwrite = FALSE, mc.cores = 32)
 }
 \arguments{
 \item{in_dir}{input directory containing files produced by \code{\link{clim_locs_prep}}.}
 
 \item{out_dir}{output directory.}
 
+\item{overwrite}{logical, overwrite existing files.}
+
 \item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \description{
 Arrange extracted monthly climate values for point locations by location from preliminary files split by RCP,
 climate model and climate variable.
-}
-\details{
-\code{inputs} generally comes from \link{clim_inputs_table}. \code{clim_locs_prep} processes data sets referred to by
-one row of this data frame at a time. This function generates intermediary temp files used susbsequently by \code{\link{clim_locs}}
-and can be deleted afterward if not needed for other uses where it is convenient to have extracted point location climate data
-segmented into files by RCP, model and variable as opposed to by point location.
 }
 \examples{
 \dontrun{

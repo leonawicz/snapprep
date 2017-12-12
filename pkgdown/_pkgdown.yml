@@ -26,8 +26,9 @@ reference:
   - clim_dist_seasonal
   - split_monthly_files
   - clim_stats_ar5
-  - clim_locs_prep
   - clim_locs
+  - clim_locs_dec_all
+  - clim_locs_prep
 - title: Subregion grid cell tables
   contents:
   - snap_poly_list
