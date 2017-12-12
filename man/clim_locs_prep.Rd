@@ -5,14 +5,14 @@
 \title{Extract climate values for point locations}
 \usage{
 clim_locs_prep(inputs, in_dir = snapdef()$ar5dir,
-  out_dir = snapdef()$ar5dir_locs, verbose = TRUE, overwrite = FALSE)
+  out_dir = snapdef()$ar5dir_locs_prep, verbose = TRUE, overwrite = FALSE)
 }
 \arguments{
 \item{inputs}{data frame of inputs (one row). See details.}
 
 \item{in_dir}{input directory, e.g., \code{snapdef()$ar5dir}.}
 
-\item{out_dir}{output directory, e.g., \code{snapdef()$ar5dir_locs}}
+\item{out_dir}{output directory, e.g., \code{snapdef()$ar5dir_locs_prep}}
 
 \item{verbose}{logical, verbose progress.}
 
@@ -31,8 +31,8 @@ segmented into files by RCP, model and variable as opposed to by point location.
 \dontrun{
 library(dplyr)
 library(parallel)
-clim_inputs_table() \%>\%
+inputs <- clim_inputs_table() \%>\%
   filter(!(model == "ts40" & var \%in\% c("tasmin", "tasmax")))
-mclapply(split(inputs, 1:nrow(inputs)), clim_locs_prep)
+mclapply(split(inputs, 1:nrow(inputs)), clim_locs_prep, mc.cores = 32)
 }
 }

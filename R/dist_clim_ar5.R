@@ -365,7 +365,7 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, region_group, mc.c
 #'
 #' @param inputs data frame of inputs (one row). See details.
 #' @param in_dir input directory, e.g., \code{snapdef()$ar5dir}.
-#' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_locs}
+#' @param out_dir output directory, e.g., \code{snapdef()$ar5dir_locs_prep}
 #' @param verbose logical, verbose progress.
 #' @param overwrite logical, overwrite existing files.
 #'
@@ -375,12 +375,12 @@ clim_stats_ar5 <- function(type = "monthly", in_dir, out_dir, region_group, mc.c
 #' \dontrun{
 #' library(dplyr)
 #' library(parallel)
-#' clim_inputs_table() %>%
+#' inputs <- clim_inputs_table() %>%
 #'   filter(!(model == "ts40" & var %in% c("tasmin", "tasmax")))
-#' mclapply(split(inputs, 1:nrow(inputs)), clim_locs_prep)
+#' mclapply(split(inputs, 1:nrow(inputs)), clim_locs_prep, mc.cores = 32)
 #' }
 clim_locs_prep <- function(inputs, in_dir = snapdef()$ar5dir,
-  out_dir = snapdef()$ar5dir_locs, verbose = TRUE, overwrite = FALSE){
+  out_dir = snapdef()$ar5dir_locs_prep, verbose = TRUE, overwrite = FALSE){
   if(nrow(inputs) != 1)
     stop("`inputs` must be a single-row data frame (one row from `clim_inputs_table`).")
   locs <- snaplocs::locs
@@ -397,8 +397,8 @@ clim_locs_prep <- function(inputs, in_dir = snapdef()$ar5dir,
   verbose <- if(verbose) TRUE else FALSE
   x0 <- raster::extract(raster::stack(files$files, quick = TRUE), cells)
   if(verbose) cat("Matrix in memory...\n")
-  dir.create(tmpDir <- file.path(out_dir, "tempfiles"), showWarnings = FALSE, recursive = TRUE)
-  file <- paste0(tmpDir, "/", "locs_", variable, "_", rcp, "_", model, ".rds")
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  file <- paste0(out_dir, "/", "locs_", variable, "_", rcp, "_", model, ".rds")
   if(!overwrite && exists(file)) next
   x <- tibble::data_frame(RCP = factor(relabel_rcps(rcp), levels = rcp_levels),
                           GCM = factor(ifelse(model == "ts40", "CRU 4.0", model), levels = model_levels),
@@ -412,19 +412,33 @@ clim_locs_prep <- function(inputs, in_dir = snapdef()$ar5dir,
   invisible()
 }
 
-#' Under development...
+#' Arrange extracted climate values for point locations by location.
 #'
-#' Function under development...
+#' Arrange extracted monthly climate values for point locations by location from preliminary files split by RCP,
+#' climate model and climate variable.
 #'
-#' @param x a data frame.
+#' \code{inputs} generally comes from \link{clim_inputs_table}. \code{clim_locs_prep} processes data sets referred to by
+#' one row of this data frame at a time. This function generates intermediary temp files used susbsequently by \code{\link{clim_locs}}
+#' and can be deleted afterward if not needed for other uses where it is convenient to have extracted point location climate data
+#' segmented into files by RCP, model and variable as opposed to by point location.
+#'
+#' @param in_dir input directory containing files produced by \code{\link{clim_locs_prep}}.
+#' @param out_dir output directory.
+#' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' clim_locs(x)
+#' clim_locs()
 #' }
-clim_locs <- function(x){
+clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$ar5dir_locs, mc.cores = 32){
+  files <- list.files(in_dir, full.names = TRUE)
+  x <- parallel::mclapply(seq_along(files), readRDS, mc.cores = mc.cores)
+  x <- dplyr::bind_rows(x) %>% dplyr::arrange(
+    .data[["LocGroup"]], .data[["Location"]], .data[["RCP"]], .data[["GCM"]],
+    .data[["Var"]], .data[["Year"]], .data[["Month"]])
+
   .seasonal <- function(x, season){
     .season <- function(x, months){
       yrs <- range(x$Year)
@@ -444,17 +458,50 @@ clim_locs <- function(x){
                 "Spring" = .season(x, month.abb[3:5]),
                 "Summer" = .season(x, month.abb[6:8]),
                 "Autumn" = .season(x, month.abb[9:11]))
-    x <- dplyr::group_by(x, .data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]]) %>%
+    dplyr::group_by(x, .data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]],
+                    .data[["Location"]], .data[["Year"]]) %>%
       dplyr::summarise(Mean = ifelse(.data[["Var"]] == "pr",
                                      round(mean(.data[["Mean"]])), round(mean(.data[["Mean"]])))) %>%
-      dplyr::mutate(Season = factor(season, levels = season_levels)) %>%
-      dplyr::select(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]],
-                    .data[["Mean"]])
+      dplyr::ungroup() %>% dplyr::mutate(Season = factor(season, levels = season_levels)) %>%
+      dplyr::select(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
+                    .data[["Year"]], .data[["Season"]], .data[["Mean"]])
   }
-  .seasonal(x, "Annual")
-  .seasonal(x, "Winter")
-  .seasonal(x, "Spring")
-  .seasonal(x, "Summer")
-  .seasonal(x, "Autumn")
+
+  uni_locs <- paste(x$LocGroup, x$Location)
+  x <- split(x, uni_locs)
+
+  save_all <- function(x){
+    lg <- x$LocGroup[1]
+    loc <- x$Location[1]
+    dir.create(mon_dir <- file.path(out_dir, "monthly", lg), recursive = TRUE, showWarnings = FALSE)
+    file <- paste0(loc, "_clim_stats.rds")
+    saveRDS(x, file.path(mon_dir, file))
+
+    x1 <- .seasonal(x, "Annual")
+    x2 <- .seasonal(x, "Winter")
+    x3 <- .seasonal(x, "Spring")
+    x4 <- .seasonal(x, "Summer")
+    x5 <- .seasonal(x, "Autumn")
+    xs <- dplyr::bind_rows(x1, x2, x3, x4, x5) %>%
+      dplyr::arrange(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["Year"]], .data[["Season"]])
+    dir.create(sea_dir <- file.path(out_dir, "seasonal", lg), recursive = TRUE, showWarnings = FALSE)
+    saveRDS(xs, file.path(sea_dir, file))
+
+    dir.create(dec_dir <- file.path(out_dir, "decavg", "monthly", lg), recursive = TRUE, showWarnings = FALSE)
+    x <- dplyr::mutate(x, Decade = as.integer(.data[["Year"]] %% 10 - .data[["Year"]])) %>%
+      dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
+                      .data[["Decade"]], .data[["Month"]]) %>%
+      dplyr::summarise_if(is.double, function(x) round(mean(x), 1)) %>% dplyr::ungroup()
+    saveRDS(x, file.path(dec_dir, file))
+
+    dir.create(dec_dir <- file.path(out_dir, "decavg", "seasonal", lg), recursive = TRUE, showWarnings = FALSE)
+    x <- dplyr::mutate(xs, Decade = as.integer(.data[["Year"]] %% 10 - .data[["Year"]])) %>%
+      dplyr::group_by(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
+                      .data[["Decade"]], .data[["Season"]]) %>%
+      dplyr::summarise_if(is.double, function(x) round(mean(x), 1)) %>% dplyr::ungroup()
+    saveRDS(x, file.path(dec_dir, file))
+  }
+
+  parallel::mclapply(x, save_all, mc.cores = mc.cores)
   invisible()
 }

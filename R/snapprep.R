@@ -40,6 +40,7 @@ snapdef <- function(){
     ar5dir_dist_monthly_split = file.path(mldat, "climate/clim_2km_monthly_single"),
     ar5dir_dist_seasonal = file.path(mldat, "climate/clim_2km_seasonal"),
     ar5dir_dist_stats = paste0(mldat, "/climate/clim_2km_", c("monthly", "seasonal"), "_stats"),
+    ar5dir_locs_prep = file.path(mldat, "climate/clim_2km_locs/tempfiles"),
     ar5dir_locs = file.path(mldat, "climate/clim_2km_locs"),
     ar5gcm = c("GFDL-CM3", "GISS-E2-R", "IPSL-CM5A-LR", "MRI-CGCM3", "NCAR-CCSM4"),
     ar5cru = "ts40",
