@@ -478,7 +478,7 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
     dir.create(mon_dir <- file.path(out_dir, "monthly", lg), recursive = TRUE, showWarnings = FALSE)
     file <- paste0(gsub("/", "--", loc), "_clim_stats.rds")
     if(overwrite || !file.exists(file.path(mon_dir, file))){
-      x <- dplyr::select(.data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
+      x <- dplyr::select(x, .data[["RCP"]], .data[["GCM"]], .data[["Var"]], .data[["LocGroup"]], .data[["Location"]],
                          .data[["Year"]], .data[["Month"]], .data[["Mean"]])
       tryCatch(saveRDS(x, file.path(mon_dir, file)), error = function(e) { cat("Error saving", file, "\n") }) # nolint
     }
