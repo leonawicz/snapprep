@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Combine decadal climate values for point locations into one file. — clim_locs_dec_all â€¢ snapprep</title>
+<title>Consolidate decadal climate values for all point locations. — clim_locs_dec_all â€¢ snapprep</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -203,15 +203,15 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Combine decadal climate values for point locations into one file.</h1>
+    <h1>Consolidate decadal climate values for all point locations.</h1>
     </div>
 
     
-    <p>Combine extracted and curated decadal climate values (monthly and seasonal) for point locations into one file.</p>
+    <p>Consolidate extracted and curated decadal climate values (monthly and seasonal) for point locations.</p>
     
 
     <pre class="usage"><span class='fu'>clim_locs_dec_all</span>(<span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs_dec</span>,
-  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs_all</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
+  <span class='kw'>out_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs_all</span>, <span class='kw'>by_variable</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>32</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -225,10 +225,19 @@
       <td><p>output directory.</p></td>
     </tr>
     <tr>
+      <th>by_variable</th>
+      <td><p>logical, unique output file directory per climate variable. See details.</p></td>
+    </tr>
+    <tr>
       <th>mc.cores</th>
       <td><p>number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Consolidate into one monthly and one seasonal file per climate variable.
+If <code>by_variable = FALSE</code>, consolidate into one monthly and one seasonal file for all variables.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -240,7 +249,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
+      
+      <li><a href="#details">Details</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

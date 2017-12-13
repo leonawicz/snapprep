@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Arrange extracted climate values for point locations by location. — clim_locs â€¢ snapprep</title>
+<title>Arrange climate by location and compute seasonals. — clim_locs â€¢ snapprep</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -203,12 +203,13 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Arrange extracted climate values for point locations by location.</h1>
+    <h1>Arrange climate by location and compute seasonals.</h1>
     </div>
 
     
-    <p>Arrange extracted monthly climate values for point locations by location from preliminary files split by RCP,
-climate model and climate variable.</p>
+    <p>Arrange extracted monthly climate values for point locations into individual files by location
+from preliminary monthly files split by RCP, climate model and climate variable.
+Compute seasonal/annual means for temperature variables and seasonal/annual totals for precipitation.</p>
     
 
     <pre class="usage"><span class='fu'>clim_locs</span>(<span class='kw'>in_dir</span> <span class='kw'>=</span> <span class='fu'><a href='snapdef.html'>snapdef</a></span>()$<span class='no'>ar5dir_locs_prep</span>,
