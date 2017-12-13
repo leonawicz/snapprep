@@ -2,20 +2,26 @@
 % Please edit documentation in R/dist_clim_ar5.R
 \name{clim_locs_dec_all}
 \alias{clim_locs_dec_all}
-\title{Combine decadal climate values for point locations into one file.}
+\title{Consolidate decadal climate values for all point locations.}
 \usage{
 clim_locs_dec_all(in_dir = snapdef()$ar5dir_locs_dec,
-  out_dir = snapdef()$ar5dir_locs_all, mc.cores = 32)
+  out_dir = snapdef()$ar5dir_locs_all, by_variable = TRUE, mc.cores = 32)
 }
 \arguments{
 \item{in_dir}{input directory containing files produced by \code{\link{clim_locs}}.}
 
 \item{out_dir}{output directory.}
 
+\item{by_variable}{logical, unique output file directory per climate variable. See details.}
+
 \item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \description{
-Combine extracted and curated decadal climate values (monthly and seasonal) for point locations into one file.
+Consolidate extracted and curated decadal climate values (monthly and seasonal) for point locations.
+}
+\details{
+Consolidate into one monthly and one seasonal file per climate variable.
+If \code{by_variable = FALSE}, consolidate into one monthly and one seasonal file for all variables.
 }
 \examples{
 \dontrun{

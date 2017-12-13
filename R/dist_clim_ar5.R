@@ -412,11 +412,11 @@ clim_locs_prep <- function(inputs, in_dir = snapdef()$ar5dir,
   invisible()
 }
 
-#' Arrange climate by point locations by location and compute seasonals.
+#' Arrange climate by location and compute seasonals.
 #'
-#' Arrange extracted monthly climate values for point locations by location from preliminary files split by RCP,
-#' climate model and climate variable. Compute seasonal/annual means for temperature variables and seasonal/annual
-#' totals for precipitation.
+#' Arrange extracted monthly climate values for point locations into individual files by location
+#' from preliminary monthly files split by RCP, climate model and climate variable.
+#' Compute seasonal/annual means for temperature variables and seasonal/annual totals for precipitation.
 #'
 #' @param in_dir input directory containing files produced by \code{\link{clim_locs_prep}}.
 #' @param out_dir output directory.
@@ -519,12 +519,17 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
   parallel::mclapply(x, save_all, overwrite = overwrite, mc.cores = mc.cores)
 }
 
-#' Combine decadal climate values for point locations into one file.
+#' Consolidate decadal climate values for all point locations.
 #'
-#' Combine extracted and curated decadal climate values (monthly and seasonal) for point locations into one file.
+#' Consolidate extracted and curated decadal climate values (monthly and seasonal) for point locations.
+#'
+#' Consolidate into one monthly and one seasonal file per climate variable.
+#' If \code{by_variable = FALSE}, consolidate into one monthly and one seasonal file for all variables.
+#'
 #'
 #' @param in_dir input directory containing files produced by \code{\link{clim_locs}}.
 #' @param out_dir output directory.
+#' @param by_variable logical, unique output file directory per climate variable. See details.
 #' @param mc.cores number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.
 #'
 #' @export
@@ -534,14 +539,19 @@ clim_locs <- function(in_dir = snapdef()$ar5dir_locs_prep, out_dir = snapdef()$a
 #' clim_locs_dec_all()
 #' }
 clim_locs_dec_all <- function(in_dir = snapdef()$ar5dir_locs_dec, out_dir = snapdef()$ar5dir_locs_all,
-                              mc.cores = 32){
-  dir.create(out <- file.path(out_dir, "monthly"), recursive = TRUE, showWarnings = FALSE)
-  files <- list.files(file.path(in_dir, "monthly"), recursive = TRUE, full.names = TRUE)
-  x <- parallel::mclapply(files, readRDS, mc.cores = mc.cores) %>% dplyr::bind_rows()
-  saveRDS(x, file.path(out, "locs_clim_stats.rds"))
-  dir.create(out <- file.path(out_dir, "seasonal"), recursive = TRUE, showWarnings = FALSE)
-  files <- list.files(file.path(in_dir, "seasonal"), recursive = TRUE, full.names = TRUE)
-  x <- parallel::mclapply(files, readRDS, mc.cores = mc.cores) %>% dplyr::bind_rows()
-  saveRDS(x, file.path(out, "locs_clim_stats.rds"))
-  invisible()
+                              by_variable = TRUE, mc.cores = 32){
+  f <- function(id, byvar){
+    dir.create(out <- file.path(out_dir, id), recursive = TRUE, showWarnings = FALSE)
+    files <- list.files(file.path(in_dir, id), recursive = TRUE, full.names = TRUE)
+    x <- parallel::mclapply(files, readRDS, mc.cores = mc.cores) %>% dplyr::bind_rows()
+    if(byvar){
+      x <- split(x, x$Var)
+      purrr::walk2(x, names(x), ~saveRDS(.x, paste0(out, "/", .y, "_clim_stats.rds")))
+    } else {
+      saveRDS(x, file.path(out, "locs_clim_stats.rds"))
+    }
+    invisible()
+  }
+  f("monthly", by_variable)
+  f("seasonal", by_variable)
 }

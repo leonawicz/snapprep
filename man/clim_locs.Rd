@@ -2,7 +2,7 @@
 % Please edit documentation in R/dist_clim_ar5.R
 \name{clim_locs}
 \alias{clim_locs}
-\title{Arrange extracted climate values for point locations by location.}
+\title{Arrange climate by location and compute seasonals.}
 \usage{
 clim_locs(in_dir = snapdef()$ar5dir_locs_prep,
   out_dir = snapdef()$ar5dir_locs, overwrite = FALSE, mc.cores = 32)
@@ -17,8 +17,9 @@ clim_locs(in_dir = snapdef()$ar5dir_locs_prep,
 \item{mc.cores}{number of CPUs when processing years in parallel. Defaults to 32 assuming Atlas compute node context.}
 }
 \description{
-Arrange extracted monthly climate values for point locations by location from preliminary files split by RCP,
-climate model and climate variable.
+Arrange extracted monthly climate values for point locations into individual files by location
+from preliminary monthly files split by RCP, climate model and climate variable.
+Compute seasonal/annual means for temperature variables and seasonal/annual totals for precipitation.
 }
 \examples{
 \dontrun{
