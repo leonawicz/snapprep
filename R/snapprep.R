@@ -10,7 +10,7 @@ globalVariables(c(".", ".x", ".y", ".data"))
 #'
 #' \code{snapprep} is a developer package used by the SNAPverse author and maintainer.
 #' For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages,
-#' see the `snapfuns` package instead.
+#' see the `snapstat` package instead.
 
 #'
 #' @docType package
