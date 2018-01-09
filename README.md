@@ -7,7 +7,7 @@ snapprep
 
 The `snapprep` package contains R functions used to support a wide range of SNAP projects by preparing and curating useful data sets from upstream raw SNAP data. The data sets compiled with the aid of `snapprep` are then made avaible to other projects. This includes compiling data sets that are contained in SNAPverse data packages.
 
-`snapprep` is a developer package used by the SNAPverse author and maintainer. For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages, see the `snapfuns` package instead.
+`snapprep` is a developer package used by the SNAPverse author and maintainer. For user packages catering to analysis and graphing of the curated data sets available in SNAPverse data packages, see the `snapstat` package instead.
 
 Use case examples
 -----------------
