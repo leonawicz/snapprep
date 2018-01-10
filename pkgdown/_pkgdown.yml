@@ -33,6 +33,9 @@ reference:
   contents:
   - snap_poly_list
   - save_poly_cells
+- title: Amazon Web Services
+  contents:
+  - aws_upload
 
 navbar:
   type: inverse
