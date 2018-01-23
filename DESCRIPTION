@@ -1,5 +1,5 @@
 Package: snapprep
-Version: 0.2.7
+Version: 0.2.8
 Title: Prepare And Curate Useful Data Sets From Raw SNAP Data
 Description: This package is used for data munging, prep and curation of useful data sets from upstream raw SNAP data sets.
     It is a developer package useful to the author/maintainer of the SNAPverse collection of R packages.

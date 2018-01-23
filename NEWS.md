@@ -1,3 +1,7 @@
+# snapprep 0.2.8 (Release date: 2018-01-23)
+
+* Updated to work with changes in `snapgrid` package data.
+
 # snapprep 0.2.7 (Release date: 2017-12-13)
 
 * Added functions `clim_locs_prep`, `clim_locs`, and `clim_locs_dec_all` for extracting and curating point location climate data.
