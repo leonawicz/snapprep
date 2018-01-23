@@ -25,7 +25,7 @@ with SNAP template raster layers. Indices are stored for two conditions: matchin
 new cell indices based on first removing all NA-valued cells and re-indexing.
 }
 \details{
-Note that this function also folds in buffered FMO area unions from `snapgrid::swfmoBuffer` for the Alaska domain.
+Note that this function also folds in FMO area unions from `snapgrid::swfmo` for the Alaska domain.
 }
 \examples{
 \dontrun{save_poly_cells()}

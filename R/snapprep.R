@@ -52,8 +52,8 @@ snapdef <- function(){
     template_akcan2km = "/Data/Base_Data/Climate/AK_CAN_2km/projected/AR5_CMIP5_models_deprecated/rcp60/5ModelAvg/pr/pr_total_mm_AR5_5ModelAvg_rcp60_01_2006.tif",
     template_ak1km = file.path(alfex, "CMIP5_Statewide/outputs/3m/rcp45.CCSM4/Maps/2014/Age_0_2014.tif"),
     veg_ak = file.path(bsalf, "alf2005.cavm.merged.030212.tif"),
-    fmoBuffer_ak = file.path(bsalf, "fmo_2017_buffered.tif"),
-    fmoRatios_ak = file.path(bsalf, "fmo_2017_buffered_fs.tif"),
+    fmo_ak = file.path(bsalf, "fmo_standard.tif"),
+    fmoRatios_ak = file.path(bsalf, "fmo_standard_fs.tif"),
     cells_akcan1km2km = file.path(datex, "cells_akcan1km2km.rds"),
     cells_ak1km = file.path(datex, "cells_ak1km.rds"),
     celldir = datex # nolint end

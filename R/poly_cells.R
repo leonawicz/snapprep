@@ -65,7 +65,7 @@ snap_poly_list <- function(domain = "akcan"){
 #' with SNAP template raster layers. Indices are stored for two conditions: matching to all raster cell indices and matching to
 #' new cell indices based on first removing all NA-valued cells and re-indexing.
 #'
-#' Note that this function also folds in buffered FMO area unions from `snapgrid::swfmoBuffer` for the Alaska domain.
+#' Note that this function also folds in FMO area unions from `snapgrid::swfmo` for the Alaska domain.
 #'
 #'
 #' @param file_akcan file name for cell index table based on the Alaska/western Canada SNAP spatial domain.
@@ -116,7 +116,7 @@ save_poly_cells <- function(file_akcan = "cells_akcan1km2km.rds", file_ak = "cel
     shp = polylist$poly_list, grp = polylist$group_names,
     loc = polylist$poly_names, idx = idx3, mc.cores = mc.cores) %>% dplyr::bind_rows() %>%
     dplyr::mutate(Source = "ak1km")
-  rfmo1km <- snapgrid::swfmoBuffer
+  rfmo1km <- snapgrid::swfmo
   idx4 <- which(rfmo1km[] %in% 2:4 & !is.na(rak1km[])) # union of mod/crit/full FMO 15-km buffers, masked by template
   cells4 <- tibble::data_frame(Source = "ak1km", LocGroup = "FMO", Location = "MFC buffers", Cell = idx4)
   cells <- dplyr::bind_rows(tibble::data_frame(
