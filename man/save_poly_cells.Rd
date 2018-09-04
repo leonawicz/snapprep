@@ -5,7 +5,8 @@
 \title{Save rds files containing raster cell tables for polygons}
 \usage{
 save_poly_cells(file_akcan = "cells_akcan1km2km.rds",
-  file_ak = "cells_ak1km.rds", out_dir = snapdef()$celldir, mc.cores = 32)
+  file_ak = "cells_ak1km.rds", out_dir = snapdef()$celldir,
+  mc.cores = 32)
 }
 \arguments{
 \item{file_akcan}{file name for cell index table based on the Alaska/western Canada SNAP spatial domain.}

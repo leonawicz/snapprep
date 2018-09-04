@@ -5,7 +5,8 @@
 \title{Consolidate decadal climate values for all point locations.}
 \usage{
 clim_locs_dec_all(in_dir = snapdef()$ar5dir_locs_dec,
-  out_dir = snapdef()$ar5dir_locs_all, by_variable = TRUE, mc.cores = 32)
+  out_dir = snapdef()$ar5dir_locs_all, by_variable = TRUE,
+  mc.cores = 32)
 }
 \arguments{
 \item{in_dir}{input directory containing files produced by \code{\link{clim_locs}}.}

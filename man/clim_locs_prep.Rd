@@ -5,7 +5,8 @@
 \title{Extract climate values for point locations}
 \usage{
 clim_locs_prep(inputs, in_dir = snapdef()$ar5dir,
-  out_dir = snapdef()$ar5dir_locs_prep, verbose = TRUE, overwrite = FALSE)
+  out_dir = snapdef()$ar5dir_locs_prep, verbose = TRUE,
+  overwrite = FALSE)
 }
 \arguments{
 \item{inputs}{data frame of inputs (one row). See details.}

@@ -16,6 +16,10 @@ knitr::opts_chunk$set(
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/leonawicz/snapprep?branch=master&svg=true)](https://ci.appveyor.com/project/leonawicz/snapprep)
 [![Coverage Status](https://img.shields.io/codecov/c/github/leonawicz/snapprep/master.svg)](https://codecov.io/github/leonawicz/snapprep?branch=master)
 
+## SNAPverse R package ecosystem development frozen.
+
+*Development of the SNAPverse R package ecosystem has been frozen indefinitely. This project was never directly funded. I began it out of personal interest, but no longer work for SNAP. It will remain archived here for historical reference.*
+
 The `snapprep` package contains R functions used to support a wide range of SNAP projects by preparing and curating useful data sets 
 from upstream raw SNAP data. The data sets compiled with the aid of `snapprep` are then made avaible to other projects.
 This includes compiling data sets that are contained in [SNAPverse](https://leonawicz.github.io/snapverse/) data packages.

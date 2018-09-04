@@ -7,7 +7,8 @@
 clim_dist_monthly(inputs, in_dir = snapdef()$ar5dir,
   out_dir = snapdef()$ar5dir_dist_monthly, na.rm = TRUE,
   density.args = list(n = 200, adjust = 0.1), sample.size = 10000,
-  verbose = TRUE, overwrite = FALSE, move_akcan = TRUE, mc.cores = 32)
+  verbose = TRUE, overwrite = FALSE, move_akcan = TRUE,
+  mc.cores = 32)
 }
 \arguments{
 \item{inputs}{data frame of inputs (one row). See details.}

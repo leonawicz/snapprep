@@ -4,8 +4,8 @@
 \alias{clim_inputs_table}
 \title{Prepare inputs table for climate data extraction}
 \usage{
-clim_inputs_table(base_path = snapdef()$ar5dir, vars = snapdef()$ar5var,
-  models = snapdef()$ar5all)
+clim_inputs_table(base_path = snapdef()$ar5dir,
+  vars = snapdef()$ar5var, models = snapdef()$ar5all)
 }
 \arguments{
 \item{base_path}{source directory for downscaled climate tifs.}
